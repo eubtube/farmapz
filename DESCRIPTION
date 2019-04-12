@@ -1,7 +1,7 @@
-Package: RFinalProject
-Title: What the Package Does (one line, title case)
-Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
+Package: farmapz
+Title: mess with crowdsources farm data
+Version: 0.0.0.1
+Authors@R: Aaron, Miles, Zhenhua
 Description: What the package does (one paragraph).
 Depends: R (>= 3.5.1)
 License: What license is it under?
