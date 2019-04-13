@@ -1,9 +1,13 @@
 Package: farmapz
-Title: mess with crowdsources farm data
+Title: Final Project for R
 Version: 0.0.0.1
 Authors@R: Aaron, Miles, Zhenhua
-Description: What the package does (one paragraph).
+Description: mess with crowdsources farm data
 Depends: R (>= 3.5.1)
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
