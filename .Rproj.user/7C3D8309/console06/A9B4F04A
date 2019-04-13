@@ -76,4 +76,157 @@ ACE ide346.Rproj[0K[?25h[16G[15G[14G[13G[12G[11G[10G[?25lACE ide36.Rp
 [0K[?25h[?25l
 [0;32mzhmeng@IDCE-007233 [0;35m [0;33m/d/Meng_R/RFina[0Kl
 Project[0;36m (master)[0m[0K
-$[0K[3G[?25h
+$[0K[3G[?25h[?25l$ f[0K[?25hi[0Kl[0K[?25l$ fi[0K[?25h[?25l$ f[0K[?25h[?25l$[0K[3G[?25h[?25l$ g[0K[?25hi[0Kt[0K[7G[?25l$ git r[0K[?25he[0Km[0Kp[0Kt[0Ke[0K[?25l$ git rempt[0K[?25h[?25l$ git remp[0K[?25h[?25l$ git rem[0K[?25ho[0Kt[0Ke[0K[14G[?25l$ git remote a[0K[14G[?25h[15G[?25l$ git remote ad[0K[?25hd[0K[18G[?25l$ git remote add o[0K[?25hr[0Ki[0Kg[0Ki[0Kn[0K[25G[?25l$ git remote add origin ^V[0K[?25h^?[0K[?25l$ git remote add origin ^V[0K[?25h[?25l$ git remote add origin[0K[25G[?25h[24G[25G[?25l$ git remote add origin h[0K[?25ht[0Kt[0Kp[0Ks[0K:[0K/[0K/[0Kg[0Ki[0Kt[0K[?25l
+[0K[?25hb[0Ku[0K[?25lb[0K[?25h[?25l[0K[?25h[?25l[1A$ git remote add origin https://gi[0K
+[0K[1A[35G[?25h[?25l$ git remote add origin https://git[0K
+[0K[?25hh[0Ku[0Kb[0K.[0Kc[0Ko[0Km[0K/[0K/[0Kz[0Kh[0Km[0Ke[0Kn[0Kg[0K1[0K1[0K9[0K/[0Kf[0Ka[0Kr[0Km[0Ka[0Kp[0Kz[0K.[0Kg[0Ki[0Kt[0K[?25l
+[0K[?25h[?25l
+[0;32mzhmeng@IDCE-007233 [0;35m [0;33m/d/Meng_R/RFina[0Kl
+Project[0;36m (master)[0m[0K
+$[0K[3G[?25h[?25l$ g[0K[?25hi[0Kt[0K[7G[?25l$ git p[0K[?25hu[0Ks[0Kh[0K[12G[?25l$ git push -[0K[?25hu[0K[15G[?25l$ git push -u o[0K[?25hr[0Ki[0Kg[0K[?25li[0K[19G[?25h[20G[?25l$ git push -u origin[0K[?25h[22G[?25l$ git push -u origin m[0K[?25ha[0Ks[0Kt[0Ke[0Kr[0K[?25l
+[0K[?25hfatal: unable to access 'https://gi[0Kt[?25l
+hub.com//zhmeng119/farmapz.git/': T[0Kh
+e requested URL returned error: 400[0K
+[0K[?25h[?25l
+[0;32mzhmeng@IDCE-007233 [0;35m [0;33m/d/Meng_R/RFina[0Kl
+Project[0;36m (master)[0m[0K
+$[0K[3G[?25h[?25l[19A[0;33mProject[0;36m (master)[0K
+[0m$ add .gitignore DESCRIPTION NAMESP[0K
+ACE RFinalProject.Rproj[0K
+bash: add: command not found[0K
+[0K
+[0;32mzhmeng@IDCE-007233 [0;35m [0;33m/d/Meng_R/RFinalProjec[0Kt
+[0;36m (master)[0K
+[0m$ git remote add origin https://git[0K
+hub.com//zhmeng119/farmapz.git[0K
+[0K
+[0;32mzhmeng@IDCE-007233 [0;35m [0;33m/d/Meng_R/RFinalProjec[0Kt
+[0;36m (master)[0K
+[0m$ git push -u origin master[0K
+fatal: unable to access 'https://github.co[0Km
+//zhmeng119/farmapz.git/': The requested U[0KR
+L returned error: 400[0K
+[0K
+[0;32mzhmeng@IDCE-007233 [0;35m [0;33m/d/Meng_R/RFinalProjec[0Kt
+[0;36m (master)[0K
+[0m$[0K[3G[?25h[?25l[14A[0;32mzhmeng@IDCE-007233 [0;35m [0;33m/d/Meng_R/RFinalP[0Kr
+oject[0;36m (master)[0K
+[0m$ git remote add origin https://git[0K
+hub.com//zhmeng119/farmapz.git[0K
+[0K
+[0;32mzhmeng@IDCE-007233 [0;35m [0;33m/d/Meng_R/RFinalP[0Kr
+oject[0;36m (master)[0K
+[0m$ git push -u origin master[0K
+fatal: unable to access 'https://gith[0Ku
+b.com//zhmeng119/farmapz.git/': The r[0Ke
+quested URL returned error: 400[0K
+[0K
+[0;32mzhmeng@IDCE-007233 [0;35m [0;33m/d/Meng_R/RFinalP[0Kr
+oject[0;36m (master)[0K
+[0m$[0K[3G[?25h[?25l[0K[3G[?25h[?25l$ s[0K[?25hs[0Kh[0K[7G[?25l$ ssh -[0K[?25ht[0K[10G[?25l$ ssh -t g[0K[?25hi[0Kt[0K@[0Kg[0Ki[0Kt[0Kh[0Ku[0Kn[0K[?25l$ ssh -t git@githu[0K[?25hb[0K.[0Kc[0Ko[0Km[0K[?25l
+[0K[?25hEnter passphrase for key '/c/Users/Zh[0KM[?25l
+eng/.ssh/id_rsa':[0K[19G[?25h[?25l
+Enter passphrase for key '/c/Users/Zh[0KM
+eng/.ssh/id_rsa':[0K[19G[?25h[?25l
+[0K[?25hEnter passphrase for key '/c/Users/Zh[0KM[?25l
+eng/.ssh/id_rsa':[0K[19G[?25h[?25l
+git@github.com: Permission denied (pu[0Kb
+lickey).[0K
+[0K[?25h[?25l
+[0;32mzhmeng@IDCE-007233 [0;35m [0;33m/d/Meng_R/RFinalP[0Kr
+oject[0;36m (master)[0m[0K
+$[0K[3G[?25h[?25l$ ssh -t git@github.com[0K[?25h[?25l
+[0K[?25hEnter passphrase for key '/c/Users/Zh[0KM[?25l
+eng/.ssh/id_rsa':[0K[19G[?25h[?25l
+Enter passphrase for key '/c/Users/Zh[0KM
+eng/.ssh/id_rsa':[0K[19G[?25h[?25l
+Enter passphrase for key '/c/Users/Zh[0KM
+eng/.ssh/id_rsa':[0K[19G[?25h[?25l
+git@github.com: Permission denied (pu[0Kb
+lickey).[0K
+[0K[?25h[?25l
+[0;32mzhmeng@IDCE-007233 [0;35m [0;33m/d/Meng_R/RFinalP[0Kr
+oject[0;36m (master)[0m[0K
+$[0K[3G[?25h[?25l$ ssh -t git@github.com[0K[?25h[?25l
+[0K[?25hEnter passphrase for key '/c/Users/Zh[0KM[?25l
+eng/.ssh/id_rsa':[0K[19G[?25h[?25l
+Enter passphrase for key '/c/Users/Zh[0KM
+eng/.ssh/id_rsa':[0K[19G[?25h[?25l
+Enter passphrase for key '/c/Users/Zh[0KM
+eng/.ssh/id_rsa':[0K[19G[?25h[?25l
+git@github.com: Permission denied (pu[0Kb
+lickey).[0K
+[0K[?25h[?25l
+[0;32mzhmeng@IDCE-007233 [0;35m [0;33m/d/Meng_R/RFinalP[0Kr
+oject[0;36m (master)[0m[0K
+$[0K[3G[?25h[?25l$ ssh -t git@github.com[0K[?25h[?25l
+[0K[?25hEnter passphrase for key '/c/Users/Zh[0KM[?25l
+eng/.ssh/id_rsa':[0K[19G[?25h[?25l
+git@github.com: Permission denied (pu[0Kb
+lickey).[0K
+[0K[?25h[?25l
+[0;32mzhmeng@IDCE-007233 [0;35m [0;33m/d/Meng_R/RFinalP[0Kr
+oject[0;36m (master)[0m[0K
+$[0K
+[0K[?25h[?25l
+[0;32mzhmeng@IDCE-007233 [0;35m [0;33m/d/Meng_R/RFinalP[0Kr
+oject[0;36m (master)[0m[0K
+$[0K[3G[?25h[?25l$ g[0K[?25hi[0Kt[0K[7G[?25l$ git h[0K[?25hu[0K[?25l$ git h[0K[?25h[?25l$ git[0K[8G[?25h[7G[?25l$ git p[0K[?25hu[0Ks[0Kh[0K[12G[?25l$ git push -[0K[?25hu[0K[15G[?25l$ git push -u r[0K[?25h[?25l$ git push -u[0K[15G[?25h[?25l$ git push -u o[0K[?25hr[0Ki[0Kg[0Ki[0Kn[0K[22G[?25l$ git push -u origin m[0K[?25ha[0Ks[0Kt[0K[?25le[0K[26G[?25h[27G[?25l
+[0K[?25herror: src refspec maste does not mat[0Kc[?25l
+h any.[0K
+[0;31merror: failed to push some refs to 'h[0Kt
+tps://github.com//zhmeng119/farmapz.g[0Ki
+t'[0m[0K
+[0K[?25h[?25l
+[0;32mzhmeng@IDCE-007233 [0;35m [0;33m/d/Meng_R/RFinalP[0Kr
+oject[0;36m (master)[0m[0K
+$[0K[3G[?25h[?25l$ git push -u origin maste[0K[?25hr[0K[?25l
+[0K[?25hfatal: unable to access 'https://gith[0Ku[?25l
+b.com//zhmeng119/farmapz.git/': The r[0Ke
+quested URL returned error: 400[0K
+[0K[?25h[?25l
+[0;32mzhmeng@IDCE-007233 [0;35m [0;33m/d/Meng_R/RFinalP[0Kr
+oject[0;36m (master)[0m[0K
+$[0K[3G[?25h[?25l$ git push -u origin master[0K[?25h[?25l$ git push -u origin maste[0K[?25h[?25l$ ssh -t git@github.com[0K[?25h[?25l$ git push -u origin master[0K[1G[?25h[28G[?25l$ git remote add origin https://githu[0K
+b.com//zhmeng119/farmapz.git[0K[?25h[?25l
+[0K[?25hfatal: remote origin already exists.[0K[?25l
+[0K[?25h[?25l
+[0;32mzhmeng@IDCE-007233 [0;35m [0;33m/d/Meng_R/RFinalP[0Kr
+oject[0;36m (master)[0m[0K
+$[0K[3G[?25h[?25l$ git remote add origin https://githu[0K
+b.com//zhmeng119/farmapz.git[0K[?25h[?25l[1A$ git push -u origin master[0K
+[0K[1A[28G[?25h[?25l
+[?25hfatal: unable to access 'https://gith[0Ku[?25l
+b.com//zhmeng119/farmapz.git/': The r[0Ke
+quested URL returned error: 400[0K
+[0K[?25h[?25l
+[0;32mzhmeng@IDCE-007233 [0;35m [0;33m/d/Meng_R/RFinalP[0Kr
+oject[0;36m (master)[0m[0K
+$[0K[3G[?25h[?25l
+[0K[?25h[?25l
+[0;32mzhmeng@IDCE-007233 [0;35m [0;33m/d/Meng_R/RFinalP[0Kr
+oject[0;36m (master)[0m[0K
+$[0K[3G[?25h[?25l
+[0K[?25h[?25l
+[0;32mzhmeng@IDCE-007233 [0;35m [0;33m/d/Meng_R/RFinalP[0Kr
+oject[0;36m (master)[0m[0K
+$[0K[3G[?25h[?25l$ g[0K[?25hi[0K[?25lt[0K[5G[?25h[6G[7G[?25l$ git s[0K[?25ht[0Ka[0Kt[0Ku[0Ks[0K[?25l
+[0K[?25hOn branch master[0K[?25l
+Changes not staged for commit:[0K
+  (use "git add <file>..." to update [0Kw
+hat will be committed)[0K
+  (use "git checkout -- <file>..." to[0K
+discard changes in working directory)[0K
+[0K
+        [0;31mmodified:   .Rproj.user/7C3D8[0K3
+09/console06/A9B4F04A[0m[0K
+        [0;31mmodified:   .Rproj.user/7C3D8[0K3
+09/console06/INDEX001[0m[0K
+[0K
+no changes added to commit (use "git [0Ka
+dd" and/or "git commit -a")[0K
+[0K[?25h[?25l
+[0;32mzhmeng@IDCE-007233 [0;35m [0;33m/d/Meng_R/RFinalP[0Kr
+oject[0;36m (master)[0m[0K
+$[0K[3G[?25h[?25l$ g[0K[?25hi[0Kt[0K[7G[?25l$ git a[0K[?25hd[0Kd[0K[11G[?25l$ git add .[0K[?25h[?25l
+[0K[?25h
