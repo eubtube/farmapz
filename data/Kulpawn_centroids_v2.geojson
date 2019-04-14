@@ -1,0 +1,11 @@
+{
+"type": "FeatureCollection",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "grp_crops\/": null, "_uuid": "1dbd943e-dc92-44c6-8b0a-70e55796f224", "grp_fielda": "firi_tijan", "grp_site\/s": "kulpawn", "mapping_ty": "centroid", "today1": "2018-04-12", "mapping_re": "Uncultivated field", "grp_crop_1": "full", "grp_crop_2": "other", "gridcell_i": "2128" }, "geometry": { "type": "Point", "coordinates": [ -1.254703, 10.276533 ] } },
+{ "type": "Feature", "properties": { "grp_crops\/": null, "_uuid": "5443421a-b1d5-4fac-95fe-fe81668ed1b5", "grp_fielda": "firi_tijan", "grp_site\/s": "kulpawn", "mapping_ty": "centroid", "today1": "2018-04-14", "mapping_re": "Uncultivated field", "grp_crop_1": "full", "grp_crop_2": "other", "gridcell_i": "2378" }, "geometry": { "type": "Point", "coordinates": [ -1.275825, 10.233208 ] } },
+{ "type": "Feature", "properties": { "grp_crops\/": "rice", "_uuid": "ae8deab8-94a8-46f1-a3de-83ea83b62dca", "grp_fielda": "firi_tijan", "grp_site\/s": "kulpawn", "mapping_ty": "centroid", "today1": "2018-04-15", "mapping_re": "Harvested maize and rice field.", "grp_crop_1": "full", "grp_crop_2": "maize", "gridcell_i": "2420" }, "geometry": { "type": "Point", "coordinates": [ -1.2098, 10.23022 ] } },
+{ "type": "Feature", "properties": { "grp_crops\/": "beans", "_uuid": "3bcbfd3c-6921-44c8-9f62-b78a4bcb37c0", "grp_fielda": "dacosta_nyarkoh", "grp_site\/s": "kulpawn", "mapping_ty": "centroid", "today1": "2018-04-09", "mapping_re": "Mixed cropping", "grp_crop_1": "full", "grp_crop_2": "beans", "gridcell_i": "2449" }, "geometry": { "type": "Point", "coordinates": [ -1.204276, 10.222185 ] } },
+{ "type": "Feature", "properties": { "grp_crops\/": null, "_uuid": "7de2fee2-9eb8-4dac-8f3d-ef8ee6a218c3", "grp_fielda": "firi_tijan", "grp_site\/s": "kulpawn", "mapping_ty": "centroid", "today1": "2018-04-10", "mapping_re": "Uncultivated field", "grp_crop_1": "full", "grp_crop_2": "other", "gridcell_i": "2620" }, "geometry": { "type": "Point", "coordinates": [ -1.296995, 10.183536 ] } }
+]
+}
