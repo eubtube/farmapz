@@ -1,7 +1,7 @@
 Package: farmapz
 Title: Final Project for R
 Version: 0.0.0.1
-Authors@R: AMZ
+Author: AMZ
 Description: mess with crowdsources farm data
 Depends: R (>= 3.5.1)
 License: What license is it under?
