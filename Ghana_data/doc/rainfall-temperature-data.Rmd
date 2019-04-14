@@ -1,0 +1,241 @@
+---
+title: "Rainfall and temperature data"
+author: "Lyndon Estes"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    fig_caption: yes
+    toc_depth: 4
+    toc: yes
+# bibliography: components/fullbib.bib
+vignette: >
+  %\VignetteIndexEntry{Rainfall and temperature data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Overview
+
+This vignette describes additional datasets needed for the variability in planting dates, yield prediction, and rainfall variability projects. 
+
+
+## Data
+
+Two relevant datasets come bundled with this project. Several other datasets need to be downloaded from the links provided and then read in (we are not bundling them with the package because of their size)
+```{r, message = FALSE}
+library(geospaarproj)
+library(geospaar)
+library(rgdal)
+
+# SMS survey 
+f <- system.file("extdata/sms-data.csv", package = "geospaarproj")
+sms <- read.csv(f, stringsAsFactors = FALSE)
+
+# Rainfall collected at sensor pods
+f <- system.file("extdata/pod-rainfall.csv", package = "geospaarproj")
+podrf <- read.csv(f)
+```
+
+The `sms` data you will be familiar with from the [yield and planting date](yield-planting-date.html) vignette, so we covered the farmer rainfall report variable there. 
+
+### Pod rainfall 
+New here is the `podrf` dataset, that contains the daily rainfall totals from 7 environmental sensor pods that were deployed in the Southern Province of Zambia in 2015/2016. Here's a look at the spatial distribution of those pods, and what the data values look like:
+
+```{r, fig.height=5, fig.width=5, fig.align='center'}
+coordinates(podrf) <- ~lon + lat
+podrf$date <- as.Date(podrf$date, "%Y-%m-%d")
+data("districts")
+
+par(mfrow = c(2, 2), mar = c(0, 0, 1, 0))
+plot(districts, col = "grey")
+points(podrf, col = "blue", pch = 20)
+plot(podrf, pch = "")
+plot(districts, col = "grey", add = TRUE)
+points(podrf, col = "blue", pch = "+")
+
+# rainfall values
+pods <- unique(podrf$podid)
+cols <- rainbow(length(pods))
+par(mar = c(3, 3, 3, 0), mgp = c(1.5, 0.25, 0), tcl = -0.2)
+plot(rain ~ date, podrf[podrf$podid == pods[1], ], type = "l", ylab = "mm",
+     col = cols[1], ylim = c(0, 100), main = "Daily rainfall", cex.axis = 0.8)
+for(i in 2:length(pods)) {
+  lines(rain ~ date, podrf[podrf$podid == pods[i], ], col = cols[i])
+}
+plot(cumsum(rain) ~ date, podrf[podrf$podid == pods[1], ], type = "l", 
+     col = cols[1], ylim = c(0, 1000), main = "Cumulative daily rainfall", 
+     cex.axis = 0.8, ylab = "mm")
+for(i in 2:length(pods)) {
+  lines(cumsum(rain) ~ date, podrf[podrf$podid == pods[i], ], col = cols[i])
+}
+```
+
+The pods are oriented along a North-South access, and collected data from October, 2016 through April/May, 2017 (with varying end dates between them). 
+
+These rainfall data represent point observations that can be compared with the gridded values provided by the CHIRPs datasets (which we have a sample of in the `geospaar` package).  
+
+### CHIRPS
+
+We have pre-processed the CHIRPs data to provide daily observations for each ~5X5 km pixel in Zambia for the years 2008-2017.  The grids themselves can be downloaded from these links:
+
+- [2008](https://www.dropbox.com/s/h7phahgdbmoftxq/zam_chirps2008.tif?dl=0)
+- [2009](https://www.dropbox.com/s/0igf7kvmwtfwvty/zam_chirps2009.tif?dl=0)
+- [2010](https://www.dropbox.com/s/t5hjtohtoifjmk0/zam_chirps2010.tif?dl=0)
+- [2011](https://www.dropbox.com/s/h0nvsc1so6dubas/zam_chirps2011.tif?dl=0)
+- [2012](https://www.dropbox.com/s/190qoq9peuqpr3d/zam_chirps2012.tif?dl=0)
+- [2013](https://www.dropbox.com/s/g3fzasqzpw4vpu0/zam_chirps2013.tif?dl=0)
+- [2014](https://www.dropbox.com/s/z17cvypaj2ylydk/zam_chirps2014.tif?dl=0)
+- [2015](https://www.dropbox.com/s/uhzbh91i0espugn/zam_chirps2015.tif?dl=0)
+- [2016](https://www.dropbox.com/s/gfwmntoy7f6wkj1/zam_chirps2016.tif?dl=0)
+- [2017](https://www.dropbox.com/s/01w1xhf6x7n6mye/zam_chirps2017.tif?dl=0)
+
+These datasets can be downloaded to a location of your choosing and then read in.  The 2008-2017 times series should be useful for identifying variation in rainfall start dates in each year (sometime in the Oct-Dec timeframe), which is part of the planting date variability/rainfall variability analysis. 
+
+For the spatial variability of rainfall project, the 2015 (October-December layers) and 2016 (January-April layers) CHIRPS data will be important.
+
+Here is an example of how you can work with the data in both cases, using code that assumes the data are already downloaded to a particular location. You will need the `lubridate` package for this, as we are going to use that to create date vectors, which will be helpful for subsetting rainfall layers out of the various CHIRPS bricks. 
+```{r, eval = FALSE}
+library(lubridate)
+library(raster)
+
+# path to CHIRPS, assuming they are all downloaded
+p_chrp <- "~/Dropbox/data/climate/rainfall/zambia/chirps/"
+
+# contruct vector of file names
+fnms <- paste0(p_chrp, paste0("/zam_chirps", 2008:2017, ".tif"))
+
+
+# read in 2015 and 2016 CHIRPs data into a stack
+chrp1516 <- stack(lapply(2015:2016, function(x) {  # x <- 2015
+  b <- brick(fnms[grep(x, fnms)])
+  b
+}))
+names(chrp1516) <- paste0("d", 1:nlayers(chrp1516))
+
+# construct date look-up table that gives you date of each layer
+dts <- seq(ymd("2015-01-01"), ymd("2016-12-31"), by = "day") 
+dts <- data.frame("yr" = year(dts), "date" = dts)
+
+# index of October 1 - April 30 dates 
+ind <- which(dts$date >= "2015-10-01" & dts$date <= "2016-04-30")
+chrp1516_gs <- chrp1516[[ind]]
+
+png("vignettes/chrpfig.png", height = 300, width = 700)
+plot_noaxes(chrp1516_gs[[1:3]], nr = 1, nc = 3, zlim = c(0, 30))
+dev.off()
+```
+
+![](chrpfig.png)
+
+```{r, message = FALSE, echo = FALSE}
+library(lubridate)
+dts <- seq(ymd("2015-01-01"), ymd("2016-12-31"), by = "day") 
+dts <- data.frame("yr" = year(dts), "date" = dts)
+```
+
+
+This plot shows the first three dates in that subset, which are days 274, 275, and 276 in the two year time series, or `r dts[274:276, "date"]`. 
+
+Let's say you wanted to collect the last three months of each year in order to undertake an analysis of variation in the start date of the rainfall season. You could it this way.
+
+```{r, eval=FALSE}
+chrp_start <- lapply(2008:2016, function(x) {  # x <- 2008
+  print(x)
+  dts <- seq(ymd(paste0(x, "-01-01")), ymd(paste0(x, "-12-31")), by = "day") 
+  dts <- data.frame("yr" = year(dts), "date" = dts)
+  ind <- which(dts$date >= paste0(x, "-10-01") & 
+    dts$date <= paste0(x, "-12-31"))
+  b <- brick(fnms[grep(x, fnms)])
+  b <- b[[ind]]
+  names(b) <- paste0("d", ind)
+  b
+})
+```
+
+In this case we only read in the CHIRPS data for 2008-2016, because 2017's data only goes until September. The code above selects from each year's CHIRPS brick the last three months of data.
+
+So that gives the beginning steps for how you might read in the data. You will then want to do your analyses on it. How you do that is something for us to discuss. 
+
+
+### Temperature data
+
+To accompany the precipitation data, we have improved temperature data from the Princeton Global Forcing dataset [@sheffield_development_2006], which we pre-processed into GeoTiffs for the years 2015 and 2016, as documented in the [PGF temperature prep](temperature-data-prep.html) vignette. Pre-pre-processing of the data was done by [Professor Justin Sheffield](https://www.southampton.ac.uk/geography/about/staff/js1c15.page) of University of Southampton Department of Geopgraphy and Environment, to make the temperature data consistent with another precipitation dataset used by our broader research group. 
+
+The data in question are not bundled with this package, but can be downloaded from the links here:
+
+[2015 TMin](https://www.dropbox.com/s/hhbpxoh5q90ye36/tmin_2015.tif?dl=0)
+[2015 TMax](https://www.dropbox.com/s/oq07ao297yj276c/tmax_2015.tif?dl=0)
+[2015 TMean](https://www.dropbox.com/s/6madmuc16diao6i/tmean_2015.tif?dl=0)
+[2016 TMin](https://www.dropbox.com/s/mro9h1itdxsxz0c/tmin_2016.tif?dl=0)
+[2016 TMax](https://www.dropbox.com/s/8ef7ie47soctl71/tmax_2016.tif?dl=0)
+[2016 TMean](https://www.dropbox.com/s/hh2lt5tx4xptj48/tmean_2016.tif?dl=0)
+
+The datasets provide daily minimum (TMin), maximum (TMax), and mean (TMean) temperatures for each of the two years, in separate bricks. 
+
+The following shows how you can load the data and process monthly means from the daily means, using the same `dts` vector, with some additions, to subset the data. 
+
+We'll also introduce a new concept: parallel computing to speed-up the calculation of the mean on multiple months
+```{r, eval = FALSE}
+library(doMC)
+library(foreach)
+
+# set up 
+dts <- seq(ymd("2015-01-01"), ymd("2016-12-31"), by = "day") 
+dts <- data.frame("yr" = year(dts), "mo" = month(dts), "date" = dts)
+unimos <- unique(dts[, c("yr", "mo")])
+unimos$moind <- 1:nrow(unimos)
+dts <- merge(dts, unimos, by = c("yr", "mo"))
+dts <- dts[order(dts$date), ]
+# dts[342:500, ]
+
+# path to PGF temp 
+p_temp <- "~/Dropbox/data/climate/temp/zambia/"
+
+# contruct vector of file names
+fnms <- paste0(p_temp, paste0("tmean_", 2015:2016, ".tif"))
+
+# Read in TMean for 2015 and 2016
+tmu1516 <- stack(lapply(fnms, function(x) {  # x <- 2015
+  b <- brick(x)
+}))
+names(tmu1516) <- paste0("d", 1:nlayers(tmu1516))
+
+# prepare indices for October 1 - April 30 dates 
+dyind <- which(dts$date >= "2015-10-01" & dts$date <= "2016-04-30") 
+dts_ss <- dts[dyind, ]  # subset data.frame of dates
+
+# subset temp stack
+tmu1516_gs <- tmu1516[[dyind]]
+
+# calculate monthly means, the normal serial way - slow
+tmu_mo_ser <- stack(lapply(unique(dts_ss$moind), function(x) {  # x <- 10
+  moind <- which(dts_ss$moind == x)
+  calc(tmu1516_gs[[moind]], mean)
+}))
+names(tmu_mo_ser) <- paste0("mo", c(10:12, 1:4))
+
+# calculate monthly means in parallel, using doMC and foreach
+# foreach behaves very much like lapply
+registerDoMC(7)  # dedicate 7 of my 8 cores, one per month to calculate
+tmu_mo_par <- foreach(x = unique(dts_ss$moind), .combine = stack) %dopar% {
+  moind <- which(dts_ss$moind == x)
+  calc(tmu1516_gs[[moind]], mean)
+}
+names(tmu_mo_par) <- paste0("mo", c(10:12, 1:4))
+
+# run this to make sure parallel and serial versions are identical 
+# (in case you don't trust that parallel version ordered months correctly)
+for(i in 1:nlayers(tmu_mo_par)) {
+  print(identical(tmu_mo_par[[i]], tmu_mo_ser[[i]]))
+}  # you will see that TRUE for each layer
+
+tmu_mo_par <- tmu_mo_par - 273.15  # data are in Kelvin, so convert to celsius
+
+png("vignettes/tmu.png", height = 300, width = 700)
+plot_noaxes(tmu_mo_par, nr = 2, nc = 3, zlim = c(15, 35))
+dev.off()
+```
+
+![](tmu.png)
+
+# References

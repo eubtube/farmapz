@@ -1,0 +1,50 @@
+## ---- eval = FALSE-------------------------------------------------------
+#  library(gdalUtils)
+#  library(glue)
+#  
+#  # file names
+#  p_chrp <- "/Users/lestes/Dropbox/data/climate/rainfall/zambia/chirps/"
+#  p_chirps <- "/Volumes/CHIRPS-2.0/africa_daily/tifs/p05/"
+#  p_temp <- "/Users/lestes/Desktop/tempdir/"
+#  p_zam <- "/Users/lestes/Dropbox/data/political/zambia/"
+#  
+#  # Read files on mounted folder for 2013, 2014 and 2017
+#  yrs <- c("2013", "2014", "2017")
+#  mos <- 1:12  # adjust to pull out specific months
+#  fnames <- unlist(sapply(yrs, function(x) {  # x <- 2015
+#    pat <- paste0(x, "\\.(", sprintf("%02i", mos), ")", collapse = "|")
+#    dir(paste0(p_chirps, x), pattern = pat, full.names = TRUE)
+#  }))
+#  
+#  # read in directly from .gz on UCSB servers Zambia subset, using
+#  # gdal_translate to convert files to geotiff and crop to extent of Zambia
+#  for(i in fnames) {  # i <- fnames[1]
+#    print(basename(i))
+#    oname <- paste0(p_temp, gsub("\\.gz", "", basename(i)))
+#    gdal_translate(src_dataset = paste0("/vsigzip/", i),
+#                   dst_dataset = oname,
+#                   projwin = bbox(zam)[c(1, 4, 3, 2)])
+#  })
+#  
+#  # create vectors of CHIRPS geotiff names with file path, grouped by year
+#  chrp_tifs <- dir(p_temp, full.names = TRUE)
+#  yrs <- lapply(c("2013", "2014", "2017"), function(x) {
+#    chrp_tifs[grep(x, chrp_tifs)]
+#  })
+#  names(yrs) <- c("2013", "2014", "2017")
+#  
+#  # Process stacking and masking in batch using gdal virtual rasters to do
+#  # intermediate steps
+#  for(i in names(yrs)) {
+#    vnm <- paste0(p_chrp, paste0("zam_chirps", i, ".vrt"))
+#    mnm <- paste0(p_chrp, paste0("zam_chirps", i, "m.vrt"))
+#    tnm <- paste0(p_chrp, paste0("zam_chirps", i, ".tif"))
+#    gdalbuildvrt(gdalfile = yrs[[i]], separate = TRUE,
+#                 output.vrt = vnm)  # create a virtual raster
+#    gdalwarp(srcfile = vnm, dstfile = mnm,
+#             cutline = paste0(p_zam, "zambia.sqlite"),
+#             crop_to_cutline = TRUE, dstnodata = -999)
+#    gdal_translate(src_dataset = mnm, dst_dataset = tnm)
+#    print(glue("finished writing {tnm}"))
+#  }
+
