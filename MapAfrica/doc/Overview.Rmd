@@ -1,0 +1,71 @@
+---
+title: "Overview"
+author: "Anela Layugan"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Overview}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Mapping Africa Project
+Mapping Africa is a project focused on gaining knowledge of where farming occurs throughout Sub-Saharan Africa using Amazon.com's Mechanical Turk Service. Crowdsourced workers were supplied with a 1km x 1km satellite image grid and asked to map the outlines of active and past crop fields that they saw. Over the summer of 2016, some fields within those areas were mapped on the ground using GPS. Those truth fields can then be used to assess the accuracy of the fields that crowdsourced workers mapped.
+
+## Study Area
+```{r, fig.height=5, fig.width=8, message=FALSE, echo=FALSE, eval=FALSE}
+library(sp)
+library(raster)
+library(rgdal)
+library(rgeos)
+library(maps)
+library(geospaarproj)
+library(MapAfrica)
+
+# ground-truth for spatial reference
+f <- system.file("extdata/truth_fmatch.sqlite", package = "geospaarproj")
+truth <- readOGR(dsn = f, layer = "truth_fmatch", verbose = FALSE)
+
+# reference map of Africa
+f <- system.file("data/Africa.shp", package = "MapAfrica")
+Africa <- readOGR(dsn = f, layer = "Africa", verbose = FALSE)
+
+# Africa reprojected to data
+Afr_proj <- spTransform(Africa, CRSobj = proj4string(truth))
+
+# reference map of study area
+f <- system.file("data/Study_Area.shp", package = "MapAfrica")
+stu_ar <- readOGR(dsn = f, layer = "Study_Area", verbose = FALSE)
+
+# study area reprojected
+stu_ar_proj <- spTransform(stu_ar, CRSobj = proj4string(truth))
+
+par(mar = c(0, 0, 1, 1), mfrow = c(1, 2))
+plot(Afr_proj, col = "grey90", main = "Africa", border = "grey50")
+plot(stu_ar_proj, col = "darkslategray4", add = TRUE)
+scalebar(d = 2000000, type = "bar", divs = 2, below = "km", 
+         label = c("0","","2000"))
+plot(stu_ar_proj, col = "darkslategray4", main = "Countries with Worker Fields")
+text(stu_ar_proj, labels = stu_ar_proj$NAME_ENGLI)
+scalebar(d = 700000, type = "bar", divs = 2, below = "km", 
+         col = "darkslateblue", label = c("0","","700"))
+```
+Figure 1. The areas of Africa that contain worker fields for assessment.
+
+## Goals
+The main goal of this project is to assess the accuracy of the workers against the truth polygons. This main goal is subsetted into three specific goals:
+
+### Goal 1: Hits and Misses
+The number of workers that did not map fields in grids that contain truth fields are counted to understand which truth fields workers did not see in satellite imagery. The truth fields that were missed are analyzed for any commonalities. All worker fields in grids that contain truth fields are counted as hits.
+
+### Goal 2: Summary Statistics
+The summary statistics (mean, standard deviation, and 95th percentile) of all truth fields and all worker fields that intersect with them are calculated to assess any broad differences between the two. Worker fields that intersect with truth fields are chosen in this analysis because they are assumed to represent the truth fields that workers attempted to map. If more than one worker field intersects with a truth field, the worker field that has the most intersecting area is chosen.
+
+### Goal 3: Accuracy
+The accuracy of each intersecting worker field is assessed using a true positive rate, a false negative rate, and a false positive rate. These rates are calculated using the following formulas:
+
+* true positive rate = area of intersection / area of truth field
+* false negative rate = area of truth field outside of intersection / area of truth field
+* false positive rate = area of worker field outside of intersection / area of truth field
+
+The mean and standard deviations of the rates are then calculated for each worker to assess how well each worker mapped their areas.

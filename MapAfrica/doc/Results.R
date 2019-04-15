@@ -1,0 +1,228 @@
+## ---- echo=FALSE, message=FALSE, eval=FALSE------------------------------
+#  library(sp)
+#  library(rgdal)
+#  library(rgeos)
+#  library(raster)
+#  library(geospaarproj)
+#  
+#  # maps made by Mechanical Turk workers
+#  f <- system.file("extdata/worker_fmaps.sqlite", package = "geospaarproj")
+#  workers <- readOGR(dsn = f, layer = "worker_fmaps", verbose = FALSE)
+#  
+#  # ground-truth
+#  f <- system.file("extdata/truth_fmatch.sqlite", package = "geospaarproj")
+#  truth <- readOGR(dsn = f, layer = "truth_fmatch", verbose = FALSE)
+#  
+#  # assignment data
+#  f <- system.file("extdata/fassignments.csv", package = "geospaarproj")
+#  assn <- read.csv(f)
+#  
+#  # sample grids
+#  f <- system.file("extdata/fgrids_alb.sqlite", package = "geospaarproj")
+#  fgrids <- readOGR(dsn = f, layer = "fgrids_alb", verbose = FALSE)
+
+## ---- echo=FALSE, eval=FALSE---------------------------------------------
+#  # fields in truth that were mapped by workers
+#  unique_workers <- unique(workers$name)
+#  yeswork <- workers[which(unique_workers %in% truth$name), ]
+#  nrow(yeswork)
+
+## ---- echo=FALSE, eval=FALSE---------------------------------------------
+#  # truth polygons in fields that do not have workers
+#  noworkers <- assn[which(!assn$name %in% truth$name), ]
+#  nrow(noworkers)
+
+## ---- fig.height=5, fig.width=7, echo=FALSE, eval=FALSE------------------
+#  truthnoworkers <- truth[noworkers$name, ]
+#  truthnoworkers_area <- gArea(truthnoworkers, byid = TRUE)
+#  hist(truthnoworkers_area, xlab = "m^2", main = "Area of Truth Fields in Grids with No Workers")
+
+## ---- echo=FALSE, eval=FALSE---------------------------------------------
+#  misses_mean <- mean(truthnoworkers_area)
+#  misses_sd <- sd(truthnoworkers_area)
+#  misses_quant <-  quantile(truthnoworkers_area, c(0.0, 0.05, 0.95, 1))
+#  misses_95 <- misses_quant[3]
+#  
+#  misses_sumstats <- matrix(c(misses_mean, misses_sd, misses_95), ncol = 3, byrow = TRUE)
+#  colnames(misses_sumstats) <- c("Mean", "Standard Deviation", "95th Percentile")
+#  rownames(misses_sumstats) <- c("Misses")
+#  misses_sumstats
+
+## ---- echo=FALSE, eval=FALSE---------------------------------------------
+#  wo_area <- gArea(yeswork, byid = TRUE)
+#  tr_area <- gArea(truth, byid = TRUE)
+#  
+#  # mean worker and truth area
+#  wo_area_mean <- mean(wo_area)
+#  tr_area_mean <- mean(tr_area)
+#  
+#  # standard deviation
+#  wo_area_sd <- sd(wo_area)
+#  tr_area_sd <- sd(tr_area)
+#  
+#  # 95th percentile
+#  wo_area_quant <- quantile(wo_area, c(0.0, 0.05, 0.95, 1))
+#  wo_area_95 <- wo_area_quant[3]
+#  
+#  tr_area_quant <- quantile(tr_area, c(0.0, 0.05, 0.95, 1))
+#  tr_area_95 <- tr_area_quant[3]
+#  
+#  wo_area_sub1 <- wo_area < 100000
+#  wo_area_sub2 <- wo_area[wo_area_sub1]
+#  
+#  tr_area_sub1 <- tr_area < 100000
+#  tr_area_sub2 <- tr_area[tr_area_sub1]
+#  
+#  sum_stats <- matrix(c(tr_area_mean, tr_area_sd, tr_area_95, wo_area_mean,
+#                        wo_area_sd, wo_area_95), ncol = 3, byrow = TRUE)
+#  colnames(sum_stats) <- c("Mean", "Standard Deviation", "95th Percentile")
+#  rownames(sum_stats) <- c("Truth", "Workers")
+#  sum_stats
+
+## ---- fig.width=8, fig.height=5, echo=FALSE, eval=FALSE------------------
+#  par(mfrow = c(2, 2))
+#  hist(tr_area, xlab = "Square Meters", main = "All Truth Fields")
+#  hist(tr_area_sub2, xlab = "Square Meters", main =
+#         "All Truth Fields < 100000 m^2")
+#  hist(wo_area, xlab = "Square Meters", main = "All Worker Fields")
+#  hist(wo_area_sub2, xlab = "Square Meters", main = "Worker Fields < 100000 m^2")
+
+## ---- echo=FALSE, eval=FALSE---------------------------------------------
+#  # subset truth fields using truth$id to remove duplicates
+#  truth_un <- truth[which(!duplicated(truth$id)),]
+#  
+#  # find which truth(s) intersect(s) with workers
+#  int <- lapply(1:length(workers), function(x){
+#    which(gIntersects(spgeom1 = workers[x, ], spgeom2 = truth_un, byid = T))
+#  })
+#  
+#  # get intersection polygons
+#  int$polys <- lapply(1:length(workers), function(x){
+#    if(length(int[[x]]) > 0){
+#      gIntersection(spgeom1 = workers[x,], spgeom2 = truth_un, byid = T)
+#    }
+#  })
+#  
+#  # calculate areas
+#  int$areas <- lapply(1:length(int$polys), function(x){
+#    if(length(int[[x]]) > 0){
+#      gArea(int$polys[[x]], byid = T)
+#    }else{
+#      0
+#    }
+#  })
+#  
+#  # calculate area of truth_un
+#  truth_un$area <- gArea(truth_un, byid = T)
+#  
+#  # calculate tp
+#  workers$tp <- lapply(1:length(int$areas), function(x){
+#    if(length(int[[x]]) == 1){
+#      int$areas[[x]] / truth_un$area[[int[[x]][which.max(int$areas[[x]])]]]
+#    }else if(length(int[[x]]) > 1){
+#      sum(int$areas[[int[[x]][which.max(int$areas[[x]])]]] /
+#        truth_un$area[[int[[x]][which.max(int$areas[[x]])]]])
+#    }else{
+#      0
+#    }
+#  })
+#  
+#  # calculate fp using gDifference
+#  dif_polys <- lapply(1:length(workers), function(x){
+#    if(length(int[[x]]) == 1){
+#      gDifference(spgeom1 = workers[x,], spgeom2 = truth_un)
+#    } else if(length(int[[x]]) > 1){
+#      gDifference(spgeom1 = workers[x,],
+#                  spgeom2 = truth_un[int[[x]][which.max(int$areas[[x]])],],
+#                  byid = T)
+#    }
+#  })
+#  
+#  dif_polys$area <- lapply(1:length(workers), function(x){
+#    if(length(dif_polys[[x]]) > 0){
+#      gArea(dif_polys[[x]])
+#    } else{
+#      0
+#    }
+#  })
+#  
+#  workers$fp <- lapply(1:length(dif_polys$area), function(x){
+#    if(length(int[[x]]) == 1){
+#      dif_polys$area[[x]] / truth_un$area[[int[[x]][which.max(int$areas[[x]])]]]
+#    }else if(length(int[[x]]) > 1){
+#      sum(dif_polys$area[[int[[x]][which.max(int$areas[[x]])]]] /
+#        truth_un$area[[int[[x]][which.max(int$areas[[x]])]]])
+#    }else{
+#      0
+#    }
+#  })
+#  
+#  
+#  # calculate fn using erase
+#  erase_polys <- lapply(1:length(workers), function(x){
+#    if(length(int[[x]]) == 1){
+#      erase(x = truth_un[int[[x]],], y = workers[x,])
+#    } else if(length(int[[x]]) > 1){
+#      erase(x = truth_un[int[[x]][which.max(int$areas[[x]])],], y = workers[x,])
+#    }
+#  })
+#  
+#  erase_polys$area <- lapply(1:length(workers), function(x){
+#    if(length(erase_polys[[x]]) > 0){
+#      gArea(erase_polys[[x]], byid = T)
+#    } else{
+#      0
+#    }
+#  })
+#  
+#  workers$fn <- lapply(1:length(erase_polys$area), function(x){
+#    if(length(int[[x]]) == 1){
+#      erase_polys$area[[x]] / truth_un$area[[int[[x]][which.max(int$areas[[x]])]]]
+#    }else if(length(int[[x]]) > 1){
+#      sum(erase_polys$area[[int[[x]][which.max(int$areas[[x]])]]] /
+#        truth_un$area[[int[[x]][which.max(int$areas[[x]])]]])
+#    }else{
+#      0
+#    }
+#  })
+
+## ---- eval = FALSE-------------------------------------------------------
+#  col_char <- list("name","fieldname")
+#  
+#  col_num <- list("tp", "fp", "fn")
+#  
+#  workers_df <- data.frame()
+#  
+#  for(i in 1:length(workers)){
+#    for(j in col_char){
+#      workers_df[i,j] <- as.character(workers[[j]][[i]])
+#    }
+#  }
+#  
+#  for(i in 1:length(workers)){
+#    for(j in col_num){
+#      workers_df[i,j] <- as.numeric(workers[[j]][[i]])
+#    }
+#  }
+#  
+#  View(workers_matrix)
+
+## ---- echo=FALSE, eval=FALSE---------------------------------------------
+#  par(mar = c(0, 0, 1, 1))
+#  plot(fgrids[fgrids$name == workers$name[[103]],])
+#  plot(workers[103,], col = rgb(1,0,0), add = T)
+#  plot(truth_un[int[[103]],], col = rgb(0,.5,.75, alpha = 0.7), add = T)
+
+## ---- echo=FALSE, eval=FALSE---------------------------------------------
+#  workers@data[103,]
+
+## ---- echo=FALSE, eval=FALSE---------------------------------------------
+#  
+#  workers_accuracy <- aggregate(workers_df[,3:5], by = list(workers_df[,"name"]),
+#                                FUN = mean)
+
+## ---- eval=FALSE---------------------------------------------------------
+#  write.csv(workers, file = "C:/Users/ALayugan/Documents/2017_2018/Fall2017/R/Final_Project/field_accuracy.csv")
+#  
+#  write.csv(workers_accuracy, file = "C:/Users/ALayugan/Documents/2017_2018/Fall2017/R/Final_Project/worker_accuracy.csv")
+

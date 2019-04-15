@@ -1,0 +1,121 @@
+---
+title: "Overview"
+author: "Anela Layugan"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Overview_A6}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Mapping Africa Project Overview
+
+## Summary
+This project assesses the accuracy of cropland fields mapped by crowdsourcers in the Mapping Africa project. Mapping Africa provided crowdsourced workers with 1km^2 grids of a satellite image of an area in Africa and asked them to map the outlines of cropland fields they saw in each grid. 453 fields were mapped on the ground in these grids using GPS, so these truth fields can be used to assess the accuracy of the mapped fields.
+
+The main goals of this project are to, for each crowdsource-mapped field that intersects with the ground-mapped field:
+
+* Goal 1. For each ground-mapped field:
+    + Calculate how many crowdsourced workers digitized it
+    + Caclulate how many crowdsourced workers missed it
+* Goal 2. Calculate summary statistics of worker fields that intersect with truth fields:
+    + Mean worker-mapped field size
+    + Standard deviation
+    + 95th percentile
+* Goal 3. Calculate, of each worker field:
+    + True positive area rate
+    + True negative area rate
+    + False positive area proxy
+
+## Approach and Method
+
+
+### Data
+There are four main datasets used in this project that are bundled in the `geospaarproj` package. `assn` is a dataframe that contains information collected by Mapping Africa's mapping system. `workers`, `truth`, and `fgrids` are SpatialPolygonsDataFrames that contain the spatial elements of this project. `workers` contains the field polygons mapped by crowdsourcers, `truth` contains the field polygons mapped using GPS, and `fgrids` contains the polygons of the grids provided by Mapping Africa.
+
+```{r echo = FALSE}
+library(sp)
+library(rgdal)
+library(rgeos)
+library(geospaarproj)
+
+f <- system.file("extdata/worker_fmaps.sqlite", package = "geospaarproj")
+workers <- readOGR(dsn = f, layer = "worker_fmaps", verbose = FALSE)
+
+# ground-truth
+f <- system.file("extdata/truth_fmatch.sqlite", package = "geospaarproj")
+truth <- readOGR(dsn = f, layer = "truth_fmatch", verbose = FALSE)
+
+# assignment data
+f <- system.file("extdata/fassignments.csv", package = "geospaarproj")
+assn <- read.csv(f)
+
+# sample grids
+f <- system.file("extdata/fgrids_alb.sqlite", package = "geospaarproj")
+fgrids <- readOGR(dsn = f, layer = "fgrids_alb", verbose = FALSE)
+```
+
+```{r, echo = FALSE, fig.height = 5, fig.width = 7}
+a <- truth[truth$name == "ZM0726808", ]
+c <- fgrids[a, ]
+b <- workers[workers$name == c$name, ]
+
+ab_intersect_id <- which(gIntersects(spgeom1 = a, spgeom2 = b, byid = TRUE))
+ab_intersect <- b[ab_intersect_id, ]
+
+par(mar = c(0, 0, 1, 1))
+plot(c, col = "grey")
+plot(b, col = "pink", add = TRUE)
+plot(ab_intersect, col = "green4", add = TRUE)
+raster::text(c, labels = "name", col = "black")
+plot(a, col = "blue", add = TRUE)
+```
+
+Figure 1. The example crowdsourced polygons that intersect with an example truth field, with the example truth polygon in blue, the grids it intersects with in grey, the intersecting worker polygons in green, and all worker polygons in those grids in pink.
+
+### Code
+
+Goal 1: Calculate how many crowdsourced workers digitized and missed each truth field
+
+* use `which()` on the assignment_ID fields of `truth` and `workers`
+    + create objects `yesmap` and `nomap` the find which truth fields were mapped by workers and which were not
+
+Goal 2: Summary Statistics of Worker Fields
+
+* use `rgeos::gArea` to calculate the area of each worker field
+* calculate summary statistics (mean, standard deviation, 95th percentile) using the `stats` package
+
+Goal 3: Calculate the true positive rate, false negative rate, and defined false positive proxy of each worker field that intersects with a truth field
+
+* write iterative codes using the apply family and for loops
+    + loop 1:
+        + subset each grid in `truth`, `assn`, and `workers` called `truth_gr`, `assn_gr`, and `workers_gr`
+    + loop 2:
+        + subset each truth field in `truth_gr` called `truth_fi`
+    + loop 3:
+        + subset each worker field in `workers_gr` that intersects with each truth field in `truth_fi` called `workers_fi`
+            + if there is more than one worker field that intersects with the truth field, select the field that has the most area overlap by using `rgeos::gArea` to calculate the areas of each field
+        + calculate the area of the intersection between `truth_fi` and `workers_fi` using rgeos::gIntersection and `rgeos::gArea` called `tp_area`
+        + calculate the area of each truth field that falls outside of the intersection between `truth_fi` and `workers_fi` using `rgeos::gDifference` and `rgeos::gArea` called `fn_area`
+        + calculate the area of each worker map that falls outside of the intersection between `truth_fi` and `workers_fi` using `rgeos:gDifference` and `rgeos::gArea` called `fp_area`
+    + loop 4:
+        + calculate from each worker field:
+            + true positive rate using `tp_area` / rgeos::gArea(`truth_fi`)
+            + false negative rate using `fn_area` / rgeos::gArea(`truth_fi`)
+            + false positive proxy using `fp_area` / `tp_area`
+
+### Timelines
++ Nov. 17 - Run analysis and calculations on one sample truth polygon
++ Nov. 20 - Finalize Project Overview and submit to GitHub
++ Nov. 22 - Finish writing and testing codes for inner loops (loops 3 and 4)
++ Nov. 24 - Finish writing and testing codes for outer loops (loops 1 and 2)
++ Nov. 29 - Finish writing code to bundle the loops together; Begin data analysis visualization/ map creation
++ Dec. 8 - Finalize all codes and data visualization/ maps
++ Dec. 11 - Present codes and preliminary results to the class
++ Dec. 15 - Finalize submission and submit project for grading
+
+## Anticipated outcomes
+
++ histograms and boxplots of `yesmap` and `nomap`, containing the truth fields that were and were not mapped by workers; and the `tp_area`, `fn_area`, and `fp_area` of each worker field
++ a compiled dataset of each worker field and its true positive area, false negative area, and false positive area

@@ -1,0 +1,33 @@
+Package: MapAfrica
+Type: Package
+Title: Mapping Africa Accuracy Assessment
+Version: 1.0.0
+Author: Anela Layugan
+Maintainer: <alayugan@clarku.edu>
+Description: This package contains the workspace for assessing the accuracy of
+    crowdsourced workers mapping fields in Sub-Saharan Africa under the Mapping
+    Africa Project. The vignettes "Overview," "Approach," "Results,"
+    and "Discussion" give the final outcomes of the project. The vignette 
+    "Presentation" contains a slideshow with preliminary results, while the 
+    vignette "Overview_A6" provides the description of the project before 
+    results were obtained.
+    The folder external/R contains the codes written to obtain the results of 
+    the project.
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
+RemoteType: github
+RemoteHost: api.github.com
+RemoteRepo: MapAfrica
+RemoteUsername: agroimpacts
+RemoteRef: master
+RemoteSha: 738406e63f78635df61162e4bdc6273b5abeb04b
+GithubRepo: MapAfrica
+GithubUsername: agroimpacts
+GithubRef: master
+GithubSHA1: 738406e63f78635df61162e4bdc6273b5abeb04b
+NeedsCompilation: no
+Packaged: 2019-03-21 19:10:22 UTC; dwatt
+Built: R 3.5.1; ; 2019-03-21 19:10:57 UTC; windows

@@ -1,0 +1,73 @@
+---
+title: "Approach"
+author: "Anela Layugan"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Approach}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Datasets
+This project uses four main datasets that are bundled in the `geospaarproj` package. `assn` is a dataframe that contains information collected by Mapping Africa's mapping system. `workers`, `truth`, and `fgrids` are SpatialPolygonsDataFrames that contain the spatial elements of this project: `workers` contains the field polygons mapped by crowdsourcers, `truth` contains the field polygons mapped using GPS, and `fgrids` contains the polygons of the grids provided by Mapping Africa.
+
+### Table of related variables
+
+
+Table 1. This table shows which variables are contained within the datasets used in this project. X's denote whether or not a dataset contains that variable.  
+
+### Example fields and grids
+```{r, echo = FALSE, fig.height = 7, fig.width = 5, message = FALSE, eval = FALSE, error=TRUE}
+library(sp)
+library(raster)
+library(rgdal)
+library(rgeos)
+library(maps)
+library(geospaarproj)
+library(MapAfrica)
+
+# maps made by Mechanical Turk workers
+f <- system.file("extdata/worker_fmaps.sqlite", package = "geospaarproj")
+workers <- readOGR(dsn = f, layer = "worker_fmaps", verbose = FALSE)
+
+# ground-truth fields
+f <- system.file("extdata/truth_fmatch.sqlite", package = "geospaarproj")
+truth <- readOGR(dsn = f, layer = "truth_fmatch", verbose = FALSE)
+
+# sample grids
+f <- system.file("extdata/fgrids_alb.sqlite", package = "geospaarproj")
+fgrids <- readOGR(dsn = f, layer = "fgrids_alb", verbose = FALSE)
+
+a <- truth[truth$name == "ZM0726808", ]
+c <- fgrids[a, ]
+b <- workers[workers$name == c$name, ]
+
+ab_intersect_id <- which(gIntersects(spgeom1 = a, spgeom2 = b, byid = TRUE))
+ab_intersect <- b[ab_intersect_id, ]
+
+par(mar = c(0, 0, 1, 1))
+plot(c, col = "grey")
+plot(ab_intersect, col = "darkseagreen2", add = TRUE)
+plot(a, col = "blue", add = TRUE)
+
+#![](../vignettes/fig/data_table.png)
+```
+
+Figure 1. Example truth field in blue with all intersecting worker fields in green, and the 1km x 1km grids given to the workers in grey.
+
+## Methods
+### Goal 1: Hits and Misses
+The number of hits (truth polygons that were mapped by workers) and misses (truth polygons that were not mapped by workers) were calculated using the `which()` function on the "name" variable contained in `truth`, `workers`, and `assn` datasets (Table 1). Truth fields that were mapped by workers were subsetted out of `workers`, while truth fields that do not have workers were subsetted out of `assn`.
+
+### Goal 2: Summary Statistics
+`rgeos::gArea` was used to calculate the area of worker fields and each truth field. Only worker fields that were within grids with truth fields were selected for this analysis using the `which()` function on the "name" variable in `truth` and `workers`, similarly to how hits and misses were subsetted for Goal 1. This method assumes that workers who were given grids with truth fields attempted to map those truth fields.
+
+The mean, standard deviation, and 95th percentile of all areas of chosen workers were calculated and compared against the same statistics of the areas of truth fields using the `stats` package. This analysis provides an overview of how well most workers mapped truth fields. For example, a larger mean of worker fields' areas than truth fields' area indicates that workers mapped larger fields than what exists, which may be caused by unclear field boundaries.
+
+### Goal 3: Accuracy
+First, unique truth fields in `truth` were selected using the `unique()` function because `truth` contains duplicates of fields that are in multiple grids. Next, truth fields that intersect with worker fields were selected using `which()` and `gIntersects` in an `lapply()` function that iterates over each worker field. The accuracy rates were then calculated using the worker fields and intersecting truth fields.
+
+The true positive, false negative, and false positive areas of `truth` and `workers` were calculated using `gArea` on the truth fields and the results from `gIntersection`, `gDifference`, and `erase` of the worker fields and their intersecting truth fields. The rates were then calculated using the equations described in the Overview vignette.
+
+If multiple truth fields intersected with a worker field, the truth field that has the largest intersecting area was chosen for analysis.
