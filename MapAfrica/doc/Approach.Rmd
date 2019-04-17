@@ -18,26 +18,22 @@ This project uses four main datasets that are bundled in the `geospaarproj` pack
 Table 1. This table shows which variables are contained within the datasets used in this project. X's denote whether or not a dataset contains that variable.  
 
 ### Example fields and grids
-```{r, echo = FALSE, fig.height = 7, fig.width = 5, message = FALSE, eval = FALSE, error=TRUE}
+```{r, fig.height = 7, fig.width = 5, message = FALSE}
 library(sp)
 library(raster)
 library(rgdal)
 library(rgeos)
 library(maps)
-library(geospaarproj)
-library(MapAfrica)
+library(farmapz)
 
 # maps made by Mechanical Turk workers
-f <- system.file("extdata/worker_fmaps.sqlite", package = "geospaarproj")
-workers <- readOGR(dsn = f, layer = "worker_fmaps", verbose = FALSE)
+workers <- readOGR("data/CSV Data/worker_fmaps.sqlite", layer = "worker_fmaps", verbose = FALSE)
 
 # ground-truth fields
-f <- system.file("extdata/truth_fmatch.sqlite", package = "geospaarproj")
-truth <- readOGR(dsn = f, layer = "truth_fmatch", verbose = FALSE)
+truth <- readOGR("data/CSV Data/truth_fmatch.sqlite", layer = "truth_fmatch", verbose = FALSE)
 
 # sample grids
-f <- system.file("extdata/fgrids_alb.sqlite", package = "geospaarproj")
-fgrids <- readOGR(dsn = f, layer = "fgrids_alb", verbose = FALSE)
+fgrids <- readOGR("data/CSV Data/fgrids_alb.sqlite", layer = "fgrids_alb", verbose = FALSE)
 
 a <- truth[truth$name == "ZM0726808", ]
 c <- fgrids[a, ]
