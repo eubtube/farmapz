@@ -1,0 +1,96 @@
+---
+title: "Geospaar Final Project Overview"
+authors: "Aaron Eubank, Zhenhua Meng, Miles Weule-Chandler"
+date: "April 22, 2019"
+output:
+   rmarkdown::html_document:
+     theme: flatly
+vignette: >
+  %\VignetteIndexEntry{Final Project Overview: Farmapz}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, comment = "#>")
+```
+
+##Summary: 
+(ade)
+
+#####Description
+
+This project is part of the Agroimpacts working group and seeks to use R programming to give accuracy statistics on 
+
+#####Primary Objectives
+* Objective 1: Successfully iterate and filter through all the features in our datasets to be able to run the accuracy statistics function on each polygon.
+
+* Objective 2: Adjust (as needed) and integrate fuctions from the `Rmapaccuracy` package to give accuracy statistics for each worker polygon that corresponds with a sample ground-truthed polygons.
+
+* Objective 3: Report all accuracy statistics to a separate data frame that will show accuracy for each polygon and give overarching statistics for each
+
+##Approach and Method:
+(ade)
+
+An outline of the analytical methods and code you plan to use, including the names of key packages that you will draw on. 
+
+This section should be composed of the following sub-sections:
+
+* Methods(ade):
+
+* Approach & Existing code / Packages (ade):
+
+##Data: 
+(mfwc)
+
+A brief (~250 words) description and visualization of the datasets you will be using. That means spatial plots of the main datasets and their key values, and, as a bonus, a plot of summary statistics, e.g. a histogram or boxplot of one of the more importants variables in the dataset.
+
+```{r Sample Data, fig.width = 6, fig.height = 4, fig.align = "center", error = TRUE, warning = FALSE, message = FALSE}
+library(sf)
+library(sp)
+library(raster)
+library(rgdal)
+library(rgeos)
+library(maps)
+library(farmapz)
+library(rmapaccuracy)
+
+#Maps by Mechanical Turk Workers
+zamworkers <- st_read("data/CSV Data/worker_fmaps.sqlite", layer = "worker_fmaps")
+
+#Sampling of Groundtruth Polygons
+zamtruth <- st_read("data/CSV Data/truth_fmatch.sqlite", layer = "truth_fmatch")
+
+# Grids
+zamfgrids <- st_read("data/CSV Data/fgrids_alb.sqlite", layer = "fgrids_alb")
+
+#List of Worker Assignments
+assn <- read.csv("data/CSV Data/fassignments.csv")
+
+```
+
+##Code: 
+(mfwc) 
+A bullet point summary of the analysis and coding approach that you propose to follow. For teams, this section should include a description of which member will be responsible for each bullet point.
+
+```{r Sample Code, fig.width = 6, fig.height = 4, fig.align = "center", error = TRUE, warning = FALSE, message = FALSE}
+
+```
+
+##Timelines: 
+(zm)
+
+Provide a timeline for when each portion of the analysis will be completed. These timelines should be constructed relative to the time period of presentations (during the last two weeks of class) and final project submission (during exam week). For teams, names should be associated with each step on the timeline.
+
+
+##Anticipated Outcomes:
+(zm)
+
+Briefly describe, as bullet points, the outcomes you expect for each of your primary project objectives
+
+* Outcome 1:
+
+* Outcome 2:
+
+* ...
+
