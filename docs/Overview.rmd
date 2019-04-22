@@ -14,6 +14,7 @@ vignette: >
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, comment = "#>")
 ```
+Aaron Eubank, Miles Weule-Chandler, Zhenhua Meng
 
 ##Summary: 
 (ade)
@@ -46,8 +47,8 @@ A major component of this project will be the `rmapaccuracy` package (developed 
 
 The map accuracy function creates each of our categories in the following way, which will be key to gathering the statistics
 ```{r MapAccuracy Code, fig.width = 6, fig.height = 4, fig.align = "center", error = TRUE, warning = FALSE, message = FALSE, eval = FALSE}
-#"truth" is truth polygons
-#"maps" is Mechanical Turks polygons
+#"truth" is a given truth polygon
+#"maps" is a given Mechanical Turks polygon
 
 #True Positive
 tp <- st_intersection(truth, maps)  
@@ -68,6 +69,7 @@ return(list("stats" = acc_stats, "tp" = tp, "fp" = fp, "fn" = fn, "tn" = tn))
 ```
 
 The following other packages will likely also be utilzed:
+
 * tidyverse
 * sf
 * sp
@@ -80,7 +82,16 @@ This project relies on three data sets. Ground truth polygons, which represent a
 agricultural fields mapped by a GPS unit, crowdsourced fields produced by mechanical turk workers and a 
 grid network provided by Mapping Africa.
 
-```{r Sample Data, fig.width = 6, fig.height = 4, fig.align = "center", error = TRUE, warning = FALSE, message = FALSE}
+Truth Polygon: 
+
+![](/Users/euban/desktop/Truth_Poly.png)
+
+
+
+```{r Sample Data, fig.width = 6, fig.height = 4, fig.align = "center", error = TRUE, warning = FALSE, message = FALSE, warning=FALSE, echo=FALSE, eval=FALSE}
+
+#Image: ![]("C:/Users/euban/desktop/Truth_Poly.png") 
+
 library(sf)
 library(sp)
 library(raster)
@@ -90,11 +101,11 @@ library(maps)
 library(farmapz)
 library(rmapaccuracy)
 
-truth_sub <- st_read("data/CSV Data/truth_sub.sqlite")
-workers_sub <- st_read("data/CSV Data/workers_sub.sqlite")
-grids_sub <- st_read("data/CSV Data/grids_sub.sqlite")
+truth_sub <- st_read("C:/Users/euban/OneDrive - Clark University/Geospatial Analysis with R/packages/geospaarproj/farmapz/data/CSV Data/truth_sub.sqlite")
 
-st_difference(workers_sub, truth_sub)
+workers_sub <- st_read("C:/Users/euban/OneDrive - Clark University/Geospatial Analysis with R/packages/geospaarproj/farmapz/data/CSV Data/workers_sub.sqlite")
+
+grids_sub <- st_read("C:/Users/euban/OneDrive - Clark University/Geospatial Analysis with R/packages/geospaarproj/farmapz/data/CSV Data/grids_sub.sqlite")
 
 # example truth polygon
 example_t_polygon <- truth_sub[truth_sub$ogc_fid0 == "420",]
@@ -112,35 +123,80 @@ plot(st_geometry(true_positive), col = "blue", add = TRUE)
 plot(st_geometry(false_negative), col = "grey", add = TRUE)
 ```
 
-'False positive areas are shown in red (areas present in worker polygons, but not in their 
+False positive areas are shown in red (areas present in worker polygons, but not in their 
 truth polygon counterpart). True postive area are shown in blue (shared positive geometry between a worker
 and a truth polygon). False negative areas are shown in grey (areas present in truth polygon, but not
 in their crowdsourced counterparts). 
+
+True Positive Area:
+
+![](/Users/euban/desktop/True_Positive.png)
+
+False Positve Area:
+
+![](/Users/euban/desktop/False_Positive.png)
+
+False Negative Area:
+
+![](/Users/euban/desktop/False_Negative.png)
+
+Here is a visualization of all three together:
+
+![](/Users/euban/desktop/Overlay.png)
 
 Our proposed methodology will utilize the mapaccuracy function from the `rmapaccuracy` package to iterate over truth polygons and their associated mechanical turk derived field assignments. The three characteristics described above will then be calculated for each mechanical turk assignment. Existing methodologies from similar projects will be adapted for use in this project'
 
 ##Code: 
 (mfwc) 
-A bullet point summary of the analysis and coding approach that you propose to follow. For teams, this section should include a description of which member will be responsible for each bullet point.
 
-```{r Sample Code, fig.width = 6, fig.height = 4, fig.align = "center", error = TRUE, warning = FALSE, message = FALSE}
-
-```
+* Read in three data sources described above using `st_read` (Miles)
+* Iterate over truth polygons using looping program created by team (Zhenhua & Aaron)
+* Exclude accuracy comparisons between truth polygons and crowdsourced polygons when true positive
+areas share less than 50% of the truth polygon's area. (Miles, Aaron, Zhenhua)
+* Calculate false negative, false positive and true positive area for each crowdsourced map. (Miles, Aaron, Zhenhua)
+* Transfer the statistics to a separate dataframe or list to for final statistics and analysis. (Miles)
 
 ##Timelines: 
 (zm)
 
-Provide a timeline for when each portion of the analysis will be completed. These timelines should be constructed relative to the time period of presentations (during the last two weeks of class) and final project submission (during exam week). For teams, names should be associated with each step on the timeline.
+A rough timeline of our project is as follows:
 
+* 04/08/2019 -
+Acquire the ground truth polygons data and crowdsourced fields data from Professor Estes via the Geospaarproj package. (Aaron)
+
+* 04/10/2019 -
+Explore the data and understand previous work done previously. (All)
+
+* 04/15/2019 -
+Read and understand the functions about accuracy assessment. (All)
+
+* 04/19/2019 -
+Start the construction of looping structure. (All)
+
+* 4/25/2019 -
+Integrate the accuracy assessment functions into the looping struction. (All)
+
+* 4/27/2019 -
+Funnel data into a final data frame collated by grid and field with summary statistics. (Miles)
+
+* 04/29/2019 - Create report vignettes for the project:
+    + Overview - (Aaron)
+    + Report/Results - (Miles)
+    + Description/Namespace - (Zhenhua)
+    
+
+
+* 05/03/2019
+Submit the project. (Zhenhua)
 
 ##Anticipated Outcomes:
 (zm)
 
-Briefly describe, as bullet points, the outcomes you expect for each of your primary project objectives
-
 * Outcome 1:
+A looping structure that can iterate and filter through all the features in our datasets.
 
 * Outcome 2:
+A statistics function (integrated into the looping structure) which returns the accuracy assessment for each worker polygon that relates to its corresponding truth-polygon.
 
-* ...
-
+* Outcome 3:
+A data frame that shows the accuracy for each Mechanical Turk polygon and give overarching statistics for each sampling grid, as well as statistics overall for the entire dataset.
