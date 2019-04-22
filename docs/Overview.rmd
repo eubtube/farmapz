@@ -20,16 +20,16 @@ knitr::opts_chunk$set(echo = TRUE, comment = "#>")
 
 #####Description
 
-This project is part of the Agroimpacts working group and seeks to use R programming to give accuracy statistics on polygons of farm plots in Zambia which have been created by Amazon Mechanical Turk crowndsourced Workers. Specifically, this project will compare Mechanical Turk polygons to a sampling of ground-truthed polygons to determine the true postive, false positive, and false negative areas of each polygon. The package will consist primarily of a reproducable program which will iterate through all of the ground truth polygons in a file, match them with mechnaical turk polygons by a common grid value, then for each grid, give the accuracy statistics of each polygon in that grid which intersects with the majority of a ground truth polygon.  The program will also give the compiled statistics for each grid. 
+This project is part of the Agroimpacts working group and seeks to use R programming to give accuracy statistics on polygons of farm plots in Zambia which have been created by Amazon Mechanical Turk crowdsourced Workers. Specifically, this project will compare Mechanical Turk polygons to a sampling of ground-truthed polygons to determine the true postive, false positive, and false negative areas of each polygon. The package will consist primarily of a reproducible program which will iterate through all of the ground truth polygons in a file, match them with Mechanical Turk polygons by a common grid value, then for each grid, give the accuracy statistics of each polygon in that grid which intersects with the majority of a ground truth polygon.  The program will also give the compiled statistics for each grid. 
 
-These statistics will be useful in ....
+These statistics will be useful in understanding the quality of work done by the Mechanical Turk workers and to draw conclusions about how reliable other (unsampled) polygons are, as well as which workers' products are most reliable.
 
 #####Primary Objectives
 * Objective 1: Successfully iterate and filter through all the features in our datasets to be able to run the accuracy statistics function on each polygon.
 
 * Objective 2: Adjust (as needed) and integrate fuctions from the `Rmapaccuracy` package to give accuracy statistics for each worker polygon that corresponds with a sample ground-truthed polygons.
 
-* Objective 3: Report all accuracy statistics to a separate data frame that will show accuracy for each polygon and give overarching statistics for each
+* Objective 3: Report all accuracy statistics to a separate data frame that will show accuracy for each polygon and give overarching statistics for each grid, as well as statistics overall for the entire dataset.
 
 ##Approach and Method:
 (ade)
@@ -37,20 +37,41 @@ These statistics will be useful in ....
 An outline of the analytical methods and code you plan to use, including the names of key packages that you will draw on. 
 
 * Methods(ade): 
-Geospatially, the main analytical methodd here will be traditional geoprocessing techniques including intersection and differencing, which will give the areas that each polygon overlaps. Otherwise, this is primarily an algorithmic problem, so looping, lapply, and tidyverse methods will be used to iterate, filter, and subset our data to find the accuracy statistics of each polygon.
+Geospatially, the main analytical method here will be traditional geoprocessing techniques including intersection and differencing, which will give the areas that each polygon overlaps. Otherwise, this is primarily an algorithmic problem, so looping, lapply, and tidyverse functions  will be used to iterate, filter, and subset our data to find the accuracy statistics of each polygon.
 
-Simple statistical methods for determining accuracy will also be used to get the final results.
+Simple statistical methods for determining accuracy will also be used to get the final results (see chunks below).
 
 * Approach & Existing code / Packages (ade):
-A major component of this project will be the `rmapaccuracy` package (developed by members of the Agroimpacts projects), which contains at least one function of interest, called `mapaccuracy` as well as other functions which may be useful.
+A major component of this project will be the `rmapaccuracy` package (developed by members of the Agroimpacts project), which contains at least one main function of interest, called `mapaccuracy` as well as other functions which may be useful.
+
+The map accuracy function creates each of our categories in the following way, which will be key to gathering the statistics
+```{r MapAccuracy Code, fig.width = 6, fig.height = 4, fig.align = "center", error = TRUE, warning = FALSE, message = FALSE, eval = FALSE}
+#"truth" is truth polygons
+#"maps" is Mechanical Turks polygons
+
+#True Positive
+tp <- st_intersection(truth, maps)  
+
+#False Positive
+fp <- st_difference(maps, truth)  
+
+#False Negative
+fn <- st_difference(truth, maps)  
+```
+
+From there, the area will be taken of each of these values and returned as a list using this code:
+```{r Statistics area, fig.width = 6, fig.height = 4, fig.align = "center", error = TRUE, warning = FALSE, message = FALSE, eval = FALSE}
+acc_stats <- acc_stats_sum(tp = areas["tp"], fp = areas["fp"], 
+                             fn = areas["fn"], tn = areas["tn"])
+
+return(list("stats" = acc_stats, "tp" = tp, "fp" = fp, "fn" = fn, "tn" = tn))
+```
 
 The following other packages will likely also be utilzed:
 * tidyverse
 * sf
 * sp
 * rgdal
-
-
 
 ##Data: 
 (mfwc)
