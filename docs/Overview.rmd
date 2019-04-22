@@ -20,7 +20,9 @@ knitr::opts_chunk$set(echo = TRUE, comment = "#>")
 
 #####Description
 
-This project is part of the Agroimpacts working group and seeks to use R programming to give accuracy statistics on 
+This project is part of the Agroimpacts working group and seeks to use R programming to give accuracy statistics on polygons of farm plots in Zambia which have been created by Amazon Mechanical Turk crowndsourced Workers. Specifically, this project will compare Mechanical Turk polygons to a sampling of ground-truthed polygons to determine the true postive, false positive, and false negative areas of each polygon. The package will consist primarily of a reproducable program which will iterate through all of the ground truth polygons in a file, match them with mechnaical turk polygons by a common grid value, then for each grid, give the accuracy statistics of each polygon in that grid which intersects with the majority of a ground truth polygon.  The program will also give the compiled statistics for each grid. 
+
+These statistics will be useful in ....
 
 #####Primary Objectives
 * Objective 1: Successfully iterate and filter through all the features in our datasets to be able to run the accuracy statistics function on each polygon.
@@ -34,16 +36,28 @@ This project is part of the Agroimpacts working group and seeks to use R program
 
 An outline of the analytical methods and code you plan to use, including the names of key packages that you will draw on. 
 
-This section should be composed of the following sub-sections:
+* Methods(ade): 
+Geospatially, the main analytical methodd here will be traditional geoprocessing techniques including intersection and differencing, which will give the areas that each polygon overlaps. Otherwise, this is primarily an algorithmic problem, so looping, lapply, and tidyverse methods will be used to iterate, filter, and subset our data to find the accuracy statistics of each polygon.
 
-* Methods(ade):
+Simple statistical methods for determining accuracy will also be used to get the final results.
 
 * Approach & Existing code / Packages (ade):
+A major component of this project will be the `rmapaccuracy` package (developed by members of the Agroimpacts projects), which contains at least one function of interest, called `mapaccuracy` as well as other functions which may be useful.
+
+The following other packages will likely also be utilzed:
+* tidyverse
+* sf
+* sp
+* rgdal
+
+
 
 ##Data: 
 (mfwc)
 
-A brief (~250 words) description and visualization of the datasets you will be using. That means spatial plots of the main datasets and their key values, and, as a bonus, a plot of summary statistics, e.g. a histogram or boxplot of one of the more importants variables in the dataset.
+This project relies on three data sets. Ground truth polygons, which represent accurate delineations of
+agricultural fields mapped by a GPS unit, crowdsourced fields produced by mechanical turk workers and a 
+grid network provided by Mapping Africa.
 
 ```{r Sample Data, fig.width = 6, fig.height = 4, fig.align = "center", error = TRUE, warning = FALSE, message = FALSE}
 library(sf)
@@ -55,19 +69,34 @@ library(maps)
 library(farmapz)
 library(rmapaccuracy)
 
-#Maps by Mechanical Turk Workers
-zamworkers <- st_read("data/CSV Data/worker_fmaps.sqlite", layer = "worker_fmaps")
+truth_sub <- st_read("data/CSV Data/truth_sub.sqlite")
+workers_sub <- st_read("data/CSV Data/workers_sub.sqlite")
+grids_sub <- st_read("data/CSV Data/grids_sub.sqlite")
 
-#Sampling of Groundtruth Polygons
-zamtruth <- st_read("data/CSV Data/truth_fmatch.sqlite", layer = "truth_fmatch")
+st_difference(workers_sub, truth_sub)
 
-# Grids
-zamfgrids <- st_read("data/CSV Data/fgrids_alb.sqlite", layer = "fgrids_alb")
+# example truth polygon
+example_t_polygon <- truth_sub[truth_sub$ogc_fid0 == "420",]
 
-#List of Worker Assignments
-assn <- read.csv("data/CSV Data/fassignments.csv")
+# example mechanical turk worker polygon
+example_worker_polygon <- workers_sub[workers_sub$ogc_fid0 == "1908",]
 
+false_positive <- st_difference(example_worker_polygon, example_t_polygon)
+true_positive <- st_intersection(example_worker_polygon, example_t_polygon)
+false_negative <- st_difference(example_t_polygon,example_worker_polygon)
+
+plot(st_geometry(example_t_polygon))
+plot(st_geometry(false_positive), col = "red", add = TRUE)
+plot(st_geometry(true_positive), col = "blue", add = TRUE)
+plot(st_geometry(false_negative), col = "grey", add = TRUE)
 ```
+
+'False positive areas are shown in red (areas present in worker polygons, but not in their 
+truth polygon counterpart). True postive area are shown in blue (shared positive geometry between a worker
+and a truth polygon). False negative areas are shown in grey (areas present in truth polygon, but not
+in their crowdsourced counterparts). 
+
+Our proposed methodology will utilize the mapaccuracy function from the `rmapaccuracy` package to iterate over truth polygons and their associated mechanical turk derived field assignments. The three characteristics described above will then be calculated for each mechanical turk assignment. Existing methodologies from similar projects will be adapted for use in this project'
 
 ##Code: 
 (mfwc) 
