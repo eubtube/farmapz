@@ -90,8 +90,6 @@ Truth Polygon:
 
 ```{r Sample Data, fig.width = 6, fig.height = 4, fig.align = "center", error = TRUE, warning = FALSE, message = FALSE, warning=FALSE, echo=FALSE, eval=FALSE}
 
-#Image: ![]("C:/Users/euban/desktop/Truth_Poly.png") 
-
 library(sf)
 library(sp)
 library(raster)
