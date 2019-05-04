@@ -1,5 +1,9 @@
 .Rhistory
 .Rbuildignore
 .Rproj.user
+<<<<<<< HEAD
 MapAfrica/
 Ghana_data/
+=======
+MapAfrica/*
+>>>>>>> 99fb546d2b68eea6d4a459cf4bf48719efdb3ea3
