@@ -1,13 +1,5 @@
 .Rhistory
 .Rbuildignore
 .Rproj.user
-<<<<<<< HEAD
-MapAfrica/
-Ghana_data/
-=======
 MapAfrica/*
-<<<<<<< HEAD
->>>>>>> 99fb546d2b68eea6d4a459cf4bf48719efdb3ea3
-=======
 Ghana_data/*
->>>>>>> 1a252bd4b7d5f736c9d0bc9a8ba08f5b03e5e171
