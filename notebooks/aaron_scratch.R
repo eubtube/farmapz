@@ -233,3 +233,39 @@ workers$fn <- lapply(1:length(erase_polys$area), function(x){
   }
 })
 '''
+
+### Another Stab at it
+library(sp)
+library(sf)
+library(tidyverse)
+
+result2 <- list()
+#gridname2 <- list()
+for (i in 1:nrow(zamtruth_sub)){
+  tempgidlist2 <- list()
+  for (j in 1:nrow(zamworkers_sub)) {#zamworkers_sub[zamworkers_sub$name == zamtruth_sub[i,]$name, ])) {
+    #tempworker <- zamworkers_sub[zamworkers_sub$name == zamtruth_sub[i,]$name, ]
+    if(gIntersects(spgeom1 = zamtruth_sub[i,],
+                   spgeom2 = zamworkers_sub[j,])){
+      if((st_intersection(x = st_as_sf(zamworkers_sub[j,]), y = st_as_sf(zamtruth_sub[i,])) %>% st_area() / 
+          (st_area(st_as_sf(zamtruth_sub[i,])))) >= 0.5){
+        tempgidlist2 <- tempgidlist2 %>% append(st_as_sf(zamworkers_sub[j,])) %>% append(st_as_sf(zamtruth_sub[i,]))
+        message('sufficient area for assessment')
+      }else {
+        print('insufficient area for assessment')
+      }
+    }else {
+      message("no intersection")
+    }
+  }
+  #tempgidlist2 <- tempgidlist2 %>% append(st_as_sf(zamtruth_sub[i,]))
+  result2 <- result2 %>% append(list(tempgidlist2))
+}
+
+plot(geometry(zamworkers_sub[zamworkers_sub$name == zamtruth_sub[1,]$name, ][1,]))
+
+plot(geometry(result2))
+
+
+plot(zamtruth_sub[1, ])
+plot(zamworkers_sub[1, ])

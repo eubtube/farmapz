@@ -81,34 +81,6 @@ finaldataset <- do.call(rbind,lapply(1:nrow(zamtruth_st), function(x) {  #x <- 1
     }
   }))
   wmap_stat <- rbind(temp_wmap_stat, wnomap_stat)
-
 }))
 
-
-
-
-
-###testing
-p <- zamtruth_st[1, ] p$name
-wdat <- zamassn %>% filter(zamassn$name == as.character(p$name))
-wmaps <- zamworkers_st %>% filter(name.x == as.character(p$name)) %>% filter(.$worker_id %in% wdat$worker_id)
-print(wmaps)
-
-zamassn[,]$name
-
-wnomaps <- wdat %>% filter(!worker_id %in% wmaps$worker_id)
-Tib_test <- lapply(1:nrow(wnomaps), function(y){
-  tibble(pid = p$id, gid = p$name, worker_id = wnomaps[y, ]$worker_id, tp = 0, fp = 0, fn = p %>% st_area())
-})
-
-tibble(pid = p$id, gid = p$name, tp = 0, fp = 0, fn = p %>% st_area())
-
-unique(wmaps$worker_id)
-
-ipoly <- st_intersects(p, wmaps %>% filter(worker_id == "A1QPMZNGV4BGY1"))
-
-length(ipoly[[1]])
-
-tp <- st_intersection(p, wmaps %>% filter(worker_id == z))
-
-length(wmaps %>% filter(worker_id == "A3TK9GIX5SL4UQ"))
+View(finaldataset)
