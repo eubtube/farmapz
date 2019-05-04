@@ -1,8 +1,3 @@
-library(devtools)
-
-install_github("agroimpacts/farmapz", build = TRUE,
-               auth_token = "d1344b0a76491ed261388cc4f62bb491516c9e23",
-               force = TRUE, build_opts = c("--no-resave-data", "--no-manual"))
 
 install.packages("C:/Users/euban/Desktop/rmapaccuracy.zip", repos = NULL)
 
@@ -26,6 +21,7 @@ zamtruth <- readOGR("data/CSV Data/truth_fmatch.sqlite", layer = "truth_fmatch",
 # sample grids
 zamfgrids <- readOGR("data/CSV Data/fgrids_alb.sqlite", layer = "fgrids_alb", verbose = FALSE)
 
+#List of Worker Assignments
 assn <- read.csv("data/CSV Data/fassignments.csv")
 
 
@@ -61,6 +57,7 @@ lapply(1:length(zamtruth_sub), function(x){
 
 #Looping
 
+#Who Knows
 for (i in zamtruth_sub$ogc_fid0)
   if(i == zamworkers_sub$name[i])
     for (j in zamworkers_sub$name)
@@ -68,18 +65,54 @@ for (i in zamtruth_sub$ogc_fid0)
         print(zamworkers_sub$fieldname[j])
     }
 
+#Starting Loop for Subset
 for (i in 1:nrow(zamtruth_sub)){ 
   if(zamtruth_sub$name[i] %in% zamworkers_sub$name)
     print(zamworkers_sub[zamworkers_sub$name == zamtruth_sub$name[i], "ogc_fid0"])
 }
 
+#Starting Loop for Full Set
 for (i in 1:nrow(zamtruth)){ 
   if(as.character(zamtruth$name[i]) %in% as.character(zamworkers$name))
     print(zamworkers[as.character(zamworkers$name) == as.character(zamtruth$name[i]), "gid"])
 }
 
-levs <- unique(c(levels(zamworkers$name)
-levels(zamtruth$name[i])
+for (i in 1:nrow(zamtruth_sub)){ 
+  if(zamtruth_sub$name[i] %in% zamworkers_sub$name){
+    # print(i)
+    templength <-
+      length(zamworkers_sub[zamworkers_sub$name == zamtruth_sub$name[i], "gid"])
+    print(templength)
+    # 
+    temp <- zamworkers_sub[zamworkers_sub$name == zamtruth_sub$name[i], "gid"]
+    print("11111111111111111111111111111111111111")
+    # truth polygon that temp intersected with
+    temptruth <- zamtruth_sub[zamtruth_sub$name[i],]
+    tempgidlist <- list()
+    for (poly in 1:templength) {
+      if(gIntersects(spgeom1 = temp[poly,],
+                     spgeom2 = temptruth,
+                     byid = T)==TRUE){
+        # temp[poly,] %>% plot()
+        # temptruth %>% plot(col="red",add=TRUE)
+        # print("haha")
+        tempgidlist <- tempgidlist %>%
+          append(polygons(temp[poly,]))
+        if(area(st_intersection(temptruth, temp[poly, ]) < 0.5(area(temptruth)))){
+          message("no intersection")
+        }
+      }
+      else{
+        message("no intersection")
+      }
+      
+      # print("2222222222222222222222222222222222222")
+      print(tempgidlist)
+    }
+    
+  }
+}
+
 
 for (i in 1:nrow(zamfgrids_sub)){
   if(zamtruth_sub$name[i] )
