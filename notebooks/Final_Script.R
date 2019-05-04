@@ -1,7 +1,7 @@
 library(sf)
 library(dplyr)
 
-#DATA MANAGEMENT
+# DATA MANAGEMENT
 # maps made by Mechanical Turk workers
 zamworkers_st  <- st_read("data/CSV Data/worker_fmaps.sqlite")
 
@@ -11,10 +11,10 @@ zamtruth_st  <- st_read("data/CSV Data/truth_fmatch.sqlite")
 # assignments
 zamassn <- read.csv("data/CSV Data/fassignments.csv")
 
-#
+# joining
 zamworkers_st <- inner_join(x = zamworkers_st, y = zamassn, by = "assignment_id")
 
-#Accuracy Function
+# Accuracy Function
 acc_stats_sum <- function(tp, fp, fn) {
   agree <- tp / sum(tp, fn)  # Simple agreement class 1
   if(is.na(agree)) agree <- 0  # Set to 0 if NA
@@ -26,7 +26,7 @@ acc_stats_sum <- function(tp, fp, fn) {
   return(out)
 }
 
-#Core
+# Core
 
 ##wmap_stat <- tibble()
 
@@ -38,8 +38,8 @@ finaldataset <- do.call(rbind,lapply(1:nrow(zamtruth_st), function(x) {  #x <- 1
   wnomaps <- wdat %>% filter(!worker_id %in% wmaps$worker_id)
 
   # statistic info for all assignments
-  wnomap_stat <- tibble(pid = p$id, gid = p$name, worker_id = wnomaps$worker_id, tp = 0, fp = 0,
-                        fn = p %>% st_area())
+  wnomap_stat <- tibble(truthid = p$id, gridid = p$name, worker_id = wnomaps$worker_id, polyid = NA, tp = 0, fp = 0,
+                        fn = p %>% st_area(), accuracy = 0)
   temp_wmap_stat <- do.call(rbind, lapply(unique(wdat$worker_id), function(y) { # y <- unique(wdat$worker_id)[1]
     ipoly <- st_intersects(p, wmaps %>% filter(worker_id == y)) %>% unlist
     wmaps_sub <- wmaps %>% filter(worker_id == y) %>% st_buffer(., 0)
@@ -47,13 +47,20 @@ finaldataset <- do.call(rbind,lapply(1:nrow(zamtruth_st), function(x) {  #x <- 1
       tp <- 0
       fp <- 0
       fn <- p %>% st_area()
-      acc <- acc_stats_sum(tp, fp, fn)
-      wmap_stat <- tibble(pid = p$id, gid = p$name, worker_id = y, tp = round(tp, 5), fp = round(fp, 5), fn = round(fn, 5))
+      acc <- 0
+      wmap_stat <- tibble(truthid = p$id, gridid = p$name, worker_id = y, polyid = NA, tp = tp, fp = round(fp, 4), fn = round(fn, 4),
+                          accuracy = round(acc, 5))
     } else if(length(ipoly) == 1) {
-      tp <- st_intersection(p, wmaps_sub) %>% st_area() %>% sum(.)
-      fp <- st_difference(wmaps_sub, p) %>% st_area() %>% sum(.)
-      fn <- st_difference(p, wmaps_sub) %>% st_area() %>% sum(.)
-      wmap_stat <- tibble(pid = p$id, gid = p$name, worker_id = y, tp = round(tp, 5), fp = round(fp, 5), fn = round(fn, 5))
+      tempwmaps <- st_buffer(wmaps %>% filter(worker_id == y), 0)
+      iarea <- st_intersection(p, st_buffer(tempwmaps, 0)) %>% st_area()
+      if((iarea %>% as.numeric())/(p %>% st_area() %>% as.numeric()) >= 0.05){
+        tp <- st_intersection(p, wmaps_sub) %>% st_area() %>% sum(.)
+        fp <- st_difference(wmaps_sub, p) %>% st_area() %>% sum(.)
+        fn <- st_difference(p, wmaps_sub) %>% st_area() %>% sum(.)
+        acc <- sum(tp) / sum(tp, fp, fn)
+        wmap_stat <- tibble(truthid = p$id, gridid = p$name, worker_id = y, polyid = tempwmaps[ipoly[1],]$gid, tp = tp, fp = round(fp, 4), fn = round(fn, 4),
+                            accuracy = round(acc, 5))
+      }
     } else { #if(length(ipoly) > 1){
       iterlength <- length(ipoly)
       maxarea <- 0
@@ -61,11 +68,13 @@ finaldataset <- do.call(rbind,lapply(1:nrow(zamtruth_st), function(x) {  #x <- 1
       wmap_stat <- tibble()
       for (i in 1:iterlength) {
         iarea <- st_intersection(p, st_buffer(tempwmaps[ipoly[i],], 0)) %>% st_area()
-        if(iarea %>% as.numeric() >= 0.1){
+        if((iarea %>% as.numeric())/(p %>% st_area() %>% as.numeric()) >= 0.05){
           tp <- iarea %>% sum(.)
           fp <- st_difference(st_buffer(tempwmaps[ipoly[i],], 0), p) %>% st_area() %>% sum(.)
           fn <- st_difference(p, st_buffer(tempwmaps[ipoly[i],], 0)) %>% st_area() %>% sum(.)
-          wmap_stat <- rbind(wmap_stat, tibble(pid = p$id, gid = p$name, worker_id = y, tp = round(tp, 5), fp = round(fp, 5), fn = round(fn, 5)))
+          acc <- sum(tp) / sum(tp, fp, fn)
+          wmap_stat <- rbind(wmap_stat, tibble(truthid = p$id, gridid = p$name, worker_id = y, polyid = tempwmaps[ipoly[i],]$gid, tp = tp, fp = round(fp, 4), fn = round(fn, 4),
+                                               accuracy = round(acc, 5)))
         }
       }
       wmap_stat <- wmap_stat
