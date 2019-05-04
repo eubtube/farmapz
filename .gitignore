@@ -1,5 +1,5 @@
 .Rhistory
 .Rbuildignore
 .Rproj.user
-MapAfrica/
-Ghana_data/
+MapAfrica/*
+Ghana_data/*
