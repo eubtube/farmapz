@@ -84,9 +84,9 @@ grid network provided by Mapping Africa.
 
 Truth Polygon: 
 
-![](/Users/euban/desktop/Truth_Poly.png)
-
-
+```{r, out.width = "50%", echo=FALSE, fig.align='center'}
+knitr::include_graphics("figures/Truth_Poly.png")
+```
 
 ```{r Sample Data, fig.width = 6, fig.height = 4, fig.align = "center", error = TRUE, warning = FALSE, message = FALSE, warning=FALSE, echo=FALSE, eval=FALSE}
 
@@ -128,19 +128,27 @@ in their crowdsourced counterparts).
 
 True Positive Area:
 
-![](/Users/euban/desktop/True_Positive.png)
+```{r, out.width = "50%", echo=FALSE, fig.align='center'}
+knitr::include_graphics("figures/True_Positive.png")
+```
 
 False Positve Area:
 
-![](/Users/euban/desktop/False_Positive.png)
+```{r, out.width = "50%", echo=FALSE, fig.align='center'}
+knitr::include_graphics("figures/False_Positive.png")
+```
 
 False Negative Area:
 
-![](/Users/euban/desktop/False_Negative.png)
+```{r, out.width = "50%", echo=FALSE, fig.align='center'}
+knitr::include_graphics("figures/False_Negative.png")
+```
 
 Here is a visualization of all three together:
 
-![](/Users/euban/desktop/Overlay.png)
+```{r, out.width = "50%", echo=FALSE, fig.align='center'}
+knitr::include_graphics("figures/Overlay.png")
+```
 
 Our proposed methodology will utilize the mapaccuracy function from the `rmapaccuracy` package to iterate over truth polygons and their associated mechanical turk derived field assignments. The three characteristics described above will then be calculated for each mechanical turk assignment. Existing methodologies from similar projects will be adapted for use in this project'
 
