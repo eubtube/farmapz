@@ -73,7 +73,7 @@ finaldataset <- do.call(rbind,lapply(1:nrow(zamtruth_st), function(x) {
                             fp = round(fp, 4), fn = round(fn, 4),
                             accuracy = round(acc, 5))
       } else{
-        # else statement assigns "NA" to polygons which do not meet 5% threshold 
+        # else statement assigns "NA" to polygons which do not meet 5% threshold
         # to identify them.
         wmap_stat <- tibble(truthid = p$id, gridid = p$name, worker_id = y,
                             polyid = tempwmaps[ipoly[1],]$gid, tp = NA,
@@ -107,7 +107,7 @@ finaldataset <- do.call(rbind,lapply(1:nrow(zamtruth_st), function(x) {
                                                accuracy = round(acc, 5)))
 
         } else {
-          # else statement assigns "NA" to polygons which do not meet 5% threshold 
+          # else statement assigns "NA" to polygons which do not meet 5% threshold
           # to identify them.
           wmap_stat <- rbind(wmap_stat, tibble(truthid = p$id, gridid = p$name,
                                                worker_id = y,
@@ -123,4 +123,3 @@ finaldataset <- do.call(rbind,lapply(1:nrow(zamtruth_st), function(x) {
   wmap_stat <- rbind(temp_wmap_stat, wnomap_stat)
 }))
 
-View(finaldataset)
