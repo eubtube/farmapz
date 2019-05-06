@@ -55,10 +55,10 @@ fn <- st_difference(truth, maps)
 
 The following packages were utilized either directly or indirectly in our final output
 
-* dplyr
-* sf
-* rmapaccuracy (agroimpacts package)
-* MapAfrica (repository created by Anela Layugan and used for reference)
+* `dplyr`
+* `sf`
+* `rmapaccuracy` (agroimpacts package)
+* `MapAfrica` (repository created by Anela Layugan and used for reference)
 
 ##Data
 
@@ -76,7 +76,6 @@ knitr::include_graphics("figures/Overlay2.png")
 
 Below is an example of how a truth polygon and a worker polygon's geometries are evaluated for accuracy:
 
-
 ```{r, out.width = "70%", echo=FALSE, fig.align='center'}
 knitr::include_graphics("figures/Accuracy_images_all.png")
 ```
@@ -88,6 +87,8 @@ and a truth polygon). False negative areas are shown in grey (areas present in t
 in their crowdsourced counterparts). 
 
 ## Methodology and Workflow
+
+####Methodology
 
 Our original code relied on a series of for loops that iterated over truth polygons and then attempted to match them with their corresponding mechanical turk assignments with the goal of comparing each valid worker assignment to its corresponding truth polygon.  We worked through about 65% of our workflow before consulting with Professor Estes, where we developed a new workflow approach.  However, the work done with this original workflow allowed us to familiarize ourselves with the data and the iteration and indexing techniques needed for the completion of this project using the second workflow.  
 
@@ -107,6 +108,7 @@ This resulted in:
 * better organization of output data (by worker id so that accuracy of each worker can be analyzed)
 
 ####Final Workflow
+
 * Read in datasets with `st_read`
 * `Inner join` worker data csv with worker polygons using "assignment_id" field.  This was done in order to relate the "worker_id" field with worker polygons.
 * An overarching `lapply` structure iterates through all truth polygons; within this `lapply`:
@@ -137,12 +139,14 @@ This resulted in:
 
 ## Final Code
 
+Below is the final script, which must be read in with the datasets below.  If this does not build directly with the package, the files can be downloaded from our package in "data/CSV Data/" and read locally into the script.
+
 ```{r Final Script, fig.width = 6, fig.height = 4, fig.align = "center", error = TRUE, warning = FALSE, message = FALSE, warning=FALSE, eval=FALSE}
 
 library(sf)
 library(dplyr)
 
-# DATA MANAGEMENT
+## DATA MANAGEMENT
 # maps made by Mechanical Turk workers
 zamworkers_st  <- st_read("data/CSV Data/worker_fmaps.sqlite")
 
@@ -152,7 +156,7 @@ zamtruth_st  <- st_read("data/CSV Data/truth_fmatch.sqlite")
 # Worker ids and assignments assignments
 zamassn <- read.csv("data/CSV Data/fassignments.csv")
 
-# joining
+# joining zamassn to worker polys to associate worker ids with polygons
 zamworkers_st <- inner_join(x = zamworkers_st, y = zamassn, by = "assignment_id")
 
 # Accuracy Function for use in the final loop
@@ -167,12 +171,10 @@ acc_stats_sum <- function(tp, fp, fn) {
   return(out)
 }
 
-# Core
-
-##wmap_stat <- tibble()
+# Core looping structure
 
 finaldataset <- do.call(rbind,lapply(1:nrow(zamtruth_st), function(x) {
-  #x <- 1 (for testing)
+  # x <- 1 (for testing)
   # Initializing
   p <- zamtruth_st[x, ]
   wdat <- zamassn %>% filter(zamassn$name == as.character(p$name))
@@ -181,22 +183,22 @@ finaldataset <- do.call(rbind,lapply(1:nrow(zamtruth_st), function(x) {
   wnomaps <- wdat %>% filter(!worker_id %in% wmaps$worker_id)
 
 # accuracy statistics info for all assignments corresponding with each truth poly
-  #first tibble for case of worker assigned to grid, but no polygons mapped
+  # first tibble for case of worker assigned to grid, but no polygons mapped
   wnomap_stat <- tibble(truthid = p$id, gridid = p$name,
                         worker_id = wnomaps$worker_id, polyid = NA, tp = 0,
                         fp = 0, fn = p %>% st_area(), accuracy = 0)
-  #New Lapply to iterate through polygons mapped by workers in a given grid
+  # New Lapply to iterate through polygons mapped by workers in a given grid
   temp_wmap_stat <- do.call(rbind, lapply(unique(wdat$worker_id), function(y) {
     # y <- unique(wdat$worker_id)[1] (for testing)
     ipoly <- st_intersects(p, wmaps %>% filter(worker_id == y)) %>% unlist
     wmaps_sub <- wmaps %>% filter(worker_id == y) %>% st_buffer(., 0)
-    #first condition for cases of no intersecting polygons with truth polygon
+    # first condition for cases of no intersecting polygons with truth polygon
     if(length(ipoly) == 0){
       tp <- 0
       fp <- 0
       fn <- p %>% st_area()
       acc <- 0
-      #first
+      # first tibble summarizing results of first condition
       wmap_stat <- tibble(truthid = p$id, gridid = p$name, worker_id = y,
                           polyid = NA, tp = tp, fp = round(fp, 4),
                           fn = round(fn, 4), accuracy = round(acc, 5))
@@ -204,23 +206,26 @@ finaldataset <- do.call(rbind,lapply(1:nrow(zamtruth_st), function(x) {
       # second condition for cases of a single intersection
       tempwmaps <- st_buffer(wmaps %>% filter(worker_id == y), 0)
       iarea <- st_intersection(p, st_buffer(tempwmaps, 0)) %>% st_area()
+      # excludes worker polygons that share less than 5% of the truth polygon's area
       if((iarea %>% as.numeric())/(p %>% st_area() %>% as.numeric()) >= 0.05){
         tp <- st_intersection(p, wmaps_sub) %>% st_area() %>% sum(.)
         fp <- st_difference(wmaps_sub, p) %>% st_area() %>% sum(.)
         fn <- st_difference(p, wmaps_sub) %>% st_area() %>% sum(.)
         acc <- sum(tp) / sum(tp, fp, fn)
+        # second tibble summarizing the results of this condition
         wmap_stat <- tibble(truthid = p$id, gridid = p$name, worker_id = y,
                             polyid = tempwmaps[ipoly[1],]$gid, tp = tp,
                             fp = round(fp, 4), fn = round(fn, 4),
                             accuracy = round(acc, 5))
-      }
-      else{
+      } else{
+        # else statement assigns "NA" to polygons which do not meet 5% threshold 
+        # to identify them.
         wmap_stat <- tibble(truthid = p$id, gridid = p$name, worker_id = y,
                             polyid = tempwmaps[ipoly[1],]$gid, tp = NA,
                             fp = NA, fn = NA,
                             accuracy = NA)
       }
-    } else { #if(length(ipoly) > 1){ (for testing)
+    } else { # (for testing) if(length(ipoly) > 1){
       # third condition for cases where there are two or more polygons in the same grid
       iterlength <- length(ipoly)
       maxarea <- 0
@@ -237,6 +242,8 @@ finaldataset <- do.call(rbind,lapply(1:nrow(zamtruth_st), function(x) {
           fn <- st_difference(p, st_buffer(tempwmaps[ipoly[i],], 0)) %>%
             st_area() %>% sum(.)
           acc <- sum(tp) / sum(tp, fp, fn)
+          # third tibble summarizing the results of this condition and appending
+          # to any previous iterations
           wmap_stat <- rbind(wmap_stat, tibble(truthid = p$id, gridid = p$name,
                                                worker_id = y,
                                                polyid = tempwmaps[ipoly[i],]$gid,
@@ -245,7 +252,8 @@ finaldataset <- do.call(rbind,lapply(1:nrow(zamtruth_st), function(x) {
                                                accuracy = round(acc, 5)))
 
         } else {
-          # worker polygons that share less than 5% of the truth polygon's area
+          # else statement assigns "NA" to polygons which do not meet 5% threshold 
+          # to identify them.
           wmap_stat <- rbind(wmap_stat, tibble(truthid = p$id, gridid = p$name,
                                                worker_id = y,
                                                polyid = tempwmaps[ipoly[i],]$gid,
@@ -271,11 +279,31 @@ knitr::include_graphics("figures/table.png")
 
 ##Conclusion / Outcomes
 
-This script achieved project goals by generating accuracy assessments for amazon mechanical turk worker maps in Zambia using ground truth polygons as a reference. This script could be adapted and used in other crowdsourced digitizing accuracy assessment initiatives.
+####Outcomes
 
-##Appendix:
+This script achieved project goals by generating accuracy assessments for Amazon Mechanical Turk worker maps in Zambia using ground truth polygons as a reference. This script could be adapted and used in other crowdsourced digitizing accuracy assessment initiatives and the data captured could be further analyzed to determine the accuracy of each worker, accuracy within each grid or accuracy by polygons of certain size thresholds, to give a few examples.
 
-#####Appendix 1: Original looping structure for illustration of original workflow
+Our objectives were reached as follows:
+
+* Objective 1: Using `lapply`, we successfully created a structure to filter through both truth polygons and worker polygons intersecting with a given truth polygon's grid, finding every polygon that intersects with more than 5% of the area of the truth polygon in order to run accuracy statistics on each.
+
+* Objective 2: Taking elements of the `map_accuracy` and `acc_stats_sum` functions from the `Rmapaccuracy` package, we successfully integrated accuracy statistics into the looping structure, and were able to capture accuracy statistics on all intersecting polygons.
+
+* Objective 3: Numerous `tibbles` were created at each conditional step of our script, but were bound together into a single tibble by running `do.call()` and `rbind()` at the beginning of each `lapply`.  The result is a single tibble of roughly 12,500 rows.  Pertinent information like truth polygon id, grid id, worker id, and id of polygon being evaluated were captured and included in this `tibble`, along with the accuracy statistics
+
+####Important Note/Consideration
+
+As the looping code is written, we have integrated a thresholding mechanism to exclude polygons which do not meet a threshold of greater than or equal to 5% area intersection with a given truth polygon. Worker polygons intersecting under this threshold were deemed to be erronously intersecting the truth polygon. 
+This means that no accuracy statistics are reported in the `tibble` for these polygons, even though other "misses" (including `wnomaps` and cases where a worker mapped a polygon but it did not intersect with the truth polygon were recorded as false negatives with an area that equalled the area of the truth polygon (a full false negative or "miss")).  Because these excluded polygons did not truly have the false negative area of the full truth polygon, we did not feel comfortable reporting that number as the statistic, but also did not want to report full accuracy statistics as these polygons are likely error and this would defeat the purpose of thresholding at all.
+
+We ultimately chose to report the excluded polygons giving only the polygon ID number and reporting "NA"" for all accuracy statistics so that they can be easily identified in the final `tibble` if full accuracy statistics, a false negative reporting, or full exclusion of these polygons is desired, this will only require minor changes to the core looping structure to report these changes.
+
+Please feel free to contact any of the authors for more information or assisstance.
+
+##Appendix
+
+####Appendix 1: Original looping structure for illustration of early workflow
+
 ```{r Appendix 1, error = TRUE, warning = FALSE, message = FALSE, warning=FALSE, eval=FALSE}
 for (i in 1:nrow(zamtruth_sub)){ 
   if(zamtruth_sub$name[i] %in% zamworkers_sub$name){
