@@ -1,11 +1,13 @@
 Package: farmapz
 Title: Final Project for R
 Version: 0.0.0.1
-Author: AMZ
-Maintainer: Z <zhmeng0119@hotmail.com>
-Description: mess with crowdsources farm data
+Author: Aaron Eubank, Zhenhua Meng and Miles-Philbert Weule Chandler
+Maintainer: Zhenhua Meng <zhmeng0119@hotmail.com>, Aaron Eubank <aeubank@clarku.edu>, 
+      Miles-Philbert Weule Chandler <mweulechandler@clarku.edu>
+Description: This package contains a final project for Geospatial 
+      Analysis with R. 
 Depends: R (>= 3.5.1)
-License: What license is it under?
+License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Imports: 
