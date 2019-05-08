@@ -9,7 +9,7 @@ output:
     toc_depth: 4
     toc: yes
 vignette: >
-  %\VignetteIndexEntry{Final Project Overview: Farmapz}
+  %\VignetteIndexEntry{Final Project Report: Farmapz}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
