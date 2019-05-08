@@ -16,23 +16,23 @@ knitr::opts_chunk$set(echo = TRUE, comment = "#>")
 ```
 Aaron Eubank, Miles Weule-Chandler, Zhenhua Meng
 
-##Summary: 
+## Summary: 
 (ade)
 
-#####Description
+##### Description
 
 This project is part of the Agroimpacts working group and seeks to use R programming to give accuracy statistics on polygons of farm plots in Zambia which have been created by Amazon Mechanical Turk crowdsourced Workers. Specifically, this project will compare Mechanical Turk polygons to a sampling of ground-truthed polygons to determine the true postive, false positive, and false negative areas of each polygon. The package will consist primarily of a reproducible program which will iterate through all of the ground truth polygons in a file, match them with Mechanical Turk polygons by a common grid value, then for each grid, give the accuracy statistics of each polygon in that grid which intersects with the majority of a ground truth polygon.  The program will also give the compiled statistics for each grid. 
 
 These statistics will be useful in understanding the quality of work done by the Mechanical Turk workers and to draw conclusions about how reliable other (unsampled) polygons are, as well as which workers' products are most reliable.
 
-#####Primary Objectives
+##### Primary Objectives
 * Objective 1: Successfully iterate and filter through all the features in our datasets to be able to run the accuracy statistics function on each polygon.
 
 * Objective 2: Adjust (as needed) and integrate fuctions from the `Rmapaccuracy` package to give accuracy statistics for each worker polygon that corresponds with a sample ground-truthed polygons.
 
 * Objective 3: Report all accuracy statistics to a separate data frame that will show accuracy for each polygon and give overarching statistics for each grid, as well as statistics overall for the entire dataset.
 
-##Approach and Method:
+## Approach and Method:
 (ade)
 
 An outline of the analytical methods and code you plan to use, including the names of key packages that you will draw on. 
@@ -152,7 +152,7 @@ knitr::include_graphics("figures/Overlay.png")
 
 Our proposed methodology will utilize the mapaccuracy function from the `rmapaccuracy` package to iterate over truth polygons and their associated mechanical turk derived field assignments. The three characteristics described above will then be calculated for each mechanical turk assignment. Existing methodologies from similar projects will be adapted for use in this project'
 
-##Code: 
+## Code: 
 (mfwc) 
 
 * Read in three data sources described above using `st_read` (Miles)
@@ -162,7 +162,7 @@ areas share less than 50% of the truth polygon's area. (Miles, Aaron, Zhenhua)
 * Calculate false negative, false positive and true positive area for each crowdsourced map. (Miles, Aaron, Zhenhua)
 * Transfer the statistics to a separate dataframe or list to for final statistics and analysis. (Miles)
 
-##Timelines: 
+## Timelines: 
 (zm)
 
 A rough timeline of our project is as follows:
@@ -195,7 +195,7 @@ Funnel data into a final data frame collated by grid and field with summary stat
 * 05/03/2019
 Submit the project. (Zhenhua)
 
-##Anticipated Outcomes:
+## Anticipated Outcomes:
 (zm)
 
 * Outcome 1:
