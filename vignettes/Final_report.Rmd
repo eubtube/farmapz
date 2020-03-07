@@ -1,5 +1,5 @@
 ---
-title: "How Well Do Crowdsources Map Individual Fields in Zambia?"
+title: "How Well Do Crowdsourcers Map Individual Fields in Zambia?"
 author: "Aaron Eubank, Zhenhua Meng, Miles-Philbert Weule Chandler"
 date: "6 May 2019"
 output:
