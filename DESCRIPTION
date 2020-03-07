@@ -2,10 +2,10 @@ Package: farmapz
 Title: Final Project for R
 Version: 0.0.0.1
 Author: Aaron Eubank, Zhenhua Meng and Miles-Philbert Weule Chandler
-Maintainer: Zhenhua Meng <zhmeng0119@hotmail.com>, Aaron Eubank <aeubank@clarku.edu>, 
+Maintainer: Zhenhua Meng <zhmeng0119@hotmail.com>, Aaron Eubank <eubank.aaron@gmail.com>, 
       Miles-Philbert Weule Chandler <mweulechandler@clarku.edu>
-Description: This package contains a final project for Geospatial 
-      Analysis with R. 
+Description: This package contains a final project for the Geospatial 
+      Analysis with R class at Clark University, 2019. 
 Depends: R (>= 3.5.1)
 License: GPL (>= 3)
 Encoding: UTF-8
